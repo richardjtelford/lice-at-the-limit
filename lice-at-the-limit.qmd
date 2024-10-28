@@ -1,5 +1,5 @@
 ---
-title: "Lice at the limits: impact of regulatory limits on lice counts in Norway and Scotland"
+title: "Lice at the limits: impact of regulatory limits on lice counts in salmon farms"
 author:
   - name: Richard J Telford
     orcid: 0000-0001-9826-3076
@@ -12,8 +12,8 @@ author:
         postal-code: N-5020
   - name: et qui?
 format: 
-  typst:
-    paper: a4
+  pdf:
+    papersize: a4
   html: 
     self-contained: true
 editor: visual
@@ -22,8 +22,10 @@ abstract: >
   on the number of lice per fish. 
   These features are consistent with aquaculture facilities taking advantage of 
   loopholes in the regulations to penalties associated with exceeding those limits.
-bibliography: lice.bib
-csl: aquaculture-international.csl
+bibliography:
+  - pakret.bib
+  - lice.bib
+#csl: aquaculture-international.csl
 execute:
   echo: false
 ---
@@ -36,45 +38,43 @@ library(patchwork)
 library(here)
 library(conflicted)
 library(pakret)
+library(rddensity)
+library(gt)
+library(glue)
 conflict_prefer_all("dplyr", quiet = TRUE)
 
 # set default ggplot theme
 theme_set(theme_bw())
+
+# source functions
+source(here("R/functions.R"))
 ```
 
 ## Introduction
 
-_Lepeophtheirus salmonis_, the salmon louse, is a parasitic copepod that infests salmonoid fish causing welfare problems# and economic losses# in the aquaculture industry and is one of the drivers of decreasing wild salmon populations#. 
-Countries with salmon farming have established regulatory frameworks, focused on the mean number of adult lice per fish [@tbl-regulations], to control lice infestations [#vormedal2023].
+_Lepeophtheirus salmonis_, the salmon louse, is a ectoparasitic copepod that infests salmonoid fish causing welfare problems# and economic losses# in the aquaculture industry and is one of the drivers of decreasing wild salmon populations#. 
+Consequently, countries with salmon farming have established regulatory frameworks, focused on the mean number of adult lice per fish [@tbl-regulations], to control lice infestations [#vormedal2023].
 
 ```{r}
 #| label: tbl-regulations
 #| tbl-cap: "Regulatory limits on the number of adult lice per fish."
 tribble(
-  ~Country, ~Period, ~Limit, 
-  "Scotland", "2021-2023", "2",
-  "Norway", "2012-1016", "0.5", 
-  "Norway", "2017-2024", "0.2 during smolt out-migration, 0.5 otherwise") |> 
-  gt::gt()
+  ~Country, ~Period, ~"Limit per fish", 
+  "British Columbia, Canada", "????", "3 motile lice", 
+  "Scotland", "2021-", "2 adult female lice triggers increases monitoring, 6 requires treatment",
+  "Norway", "2009-2012", "1 adult female lice, or 5 motile lice", 
+  "Norway", "2013-2016", "0.5 adult female lice", 
+  "Norway", "2017-", "0.2 adult female lice during smolt out-migration, 0.5 otherwise") |> 
+  gt() |> 
+  cols_width(starts_with("Limit") ~ px(260))
 ```
 
+[#Jeong2023] reported that in Norway, but not in British Columbia, the distribution of louse counts has a "cliff" at the regulatory limit.
+Here, we further examine this cliff or discontinuity in the louse counts distribution at the regulatory limit and try to explain it.
 
 
-More on limits and penalties [expand]
-
-Traffic light system [expand]
-
-Literature on regulatory thresholds??. Compliance?? Validation??
-
-Here, we examine compliance with regulatory thresholds in Scotland and Norway by examining the distribution of the mean louse counts reported by the aquaculture facilities to the national regulators.
 
 ## Methods
-
-Lice count data were downloaded from the Scottish and Norwegian regulators.
-
-All analyses were done in `pkrt("R")`.
-Code to reproduce the analyses is available from https://github.com/richardjtelford/lice-at-the-limit
-
 
 ```{r}
 #| label: load_data
@@ -86,7 +86,31 @@ norway <- readxl::read_excel(here("data/norway/lakselus_per_fisk.xlsx")) |>
 scotland <- read_delim(here("data/scotland/ms_sea_lice.zip")) |> 
   janitor::clean_names()
 
+britishcolumbia <- read_delim("data/british-columbia/lice-count-dens-pou-2011-ongoing-rpt-pac-dfo-mpo-aquaculture-eng.csv", na = "n/a") |> 
+  janitor::clean_names()
 ```
+
+```{r}
+#| label: period
+
+period <- list(
+  britishcolumbia = glue("{min(britishcolumbia$year)}--{max(britishcolumbia$year)}"),
+  scotland = glue("{min(scotland$year)}--{max(scotland$year)}"),
+  norway = glue("{min(norway$ar)}--{max(norway$ar)}")
+)
+
+```
+
+
+We examine the distribution of the mean louse counts reported by the aquaculture facilities to the national regulators using publicly available data.
+Lice count data were downloaded from the regulators in British Columbia, (Canada) (`r period$britishcolumbia`), Scotland (`r period$scotland`), and Norway (`r period$norway`).
+
+We test for discontinuities at the regulatory limits using the `r pkrt("rddensity")` package.
+All analyses were done in `r pkrt("R")`. 
+Code to reproduce the analyses is available from https://github.com/richardjtelford/lice-at-the-limit
+
+
+
 
 # Results
 
@@ -103,78 +127,243 @@ norway2 <- norway |>
   select(year = ar, week = uke, adult_female = voksne_hunnlus, limit = lusegrense_uke) |> 
   mutate(group = case_when(
     year == 2012 ~ "Norway 2012",
-    between(year, 2017, 2024) & limit == 0.2 ~ "Norway during smolt migration (2017-2024)",
-    between(year, 2017, 2024) & limit == 0.5 ~ "Norway outside smolt migration (2017-2024)",
+    between(year, 2017, 2024) & limit == 0.2 ~ "Norway 2017-2024 during smolt migration",
+    between(year, 2017, 2024) & limit == 0.5 ~ "Norway 2017-2024 outside smolt migration",
+    between(year, 2013, 2016) & limit == 0.5 ~ "Norway 2013-2016",
     .default = "other"
   )) |> 
   filter(group != "other") |> 
   mutate(limit = as.numeric(limit)) # NA warning from 2012 data
 
 plot_data <- bind_rows(scotland2, norway2) |>
-  mutate(group = factor(group, levels = c("Scotland 2021-2023", "Norway 2012", "Norway during smolt migration (2017-2024)", "Norway outside smolt migration (2017-2024)")))
+  mutate(group = factor(group, levels = c("Scotland 2021-2023", "Norway 2012", "Norway 2013-2016", "Norway 2017-2024 during smolt migration", "Norway 2017-2024 outside smolt migration")))
 
 ```
 
 
 ```{r}
 #| label: fig-hist
-#| fig-cap: Histograms of weekly louse counts from selected periods in Scotland and Norway. Histograms are truncated at 3 lice per fish. Vertical dashed lines show the applicable regulatory limits. Histogram bins are 0.01 lice wide.
-#| fig-height: 8
+#| fig-cap: Histograms of louse counts from selected periods in Scotland and Norway. Histograms are truncated at 3 lice per fish. Vertical dashed lines show the applicable regulatory limits. Histogram bins are 0.01 lice wide. Counts with zero lice are omitted.
+#| fig-height: 5
 #| warning: false
 
 lice_hist <- plot_data |> 
+  filter(group %in% c("Scotland 2021-2023", "Norway 2012", "Norway 2013-2016", "Norway 2017-2024 outside smolt migration")) |> 
   filter(adult_female > 0) |> 
   ggplot(aes(x = adult_female)) +
   geom_vline(aes(xintercept = limit), colour = "#99151c", linetype = "dashed") +
   geom_histogram(binwidth = 0.01, boundary = 0.005) +
   scale_x_continuous(expand = c(0.01, 0.01)) +
   coord_cartesian(xlim = c(0, 3)) +
-  facet_wrap(facets = vars(group), scales = "free_y", ncol = 1) +
-  labs(x = "Average number of adult female lice per fish")
+  facet_wrap(facets = vars(group), scales = "free_y", ncol = 2) +
+  labs(x = "Mean number of adult female lice per fish", ylab = "Number of surveys")
 
 lice_hist
 ```
-The Scottish data and the Norwegian data from 2012 show a near exponential decline in louse counts [@fig-hist].
+The Scottish data and the Norwegian data from 2012 shows a heavy-tailed, monotonic decline in louse counts [@fig-hist].
 The spikes in the data either reflect rounding or many counts being based on 20 fish.
 The spikes do not affect the rest of the analysis.
 Norwegian louse counts post-2017 show a different pattern, with a sharp drop to near zero counts at the regulatory limit.
 The data from outside the smolt migration period show a small rise in counts just below the regulatory limit.
-Histograms from 2013-2016 (not shown) are transitional between the patterns shown in 2012 and post-2017 
+Histograms from 2013-2016 are transitional between the patterns shown in 2012 and post-2017.
+
+```{r}
+#| label: run-rdd
+rdds <- list(
+  scotland = rdd_wrap(scotland2, adult_female, 2, xlim = c(1.5, 2.5), step = 0.02), #
+  britishcolumbia = rdd_wrap(britishcolumbia, average_l_salmonis_motiles_per_fish, 3, xlim = c(2.5, 3.5), step = 0.02, xlabel = "Number of Motile Lice")
+  )
+
+norway0.5_rdd <- set_names(2012:2024) |> 
+  map(\(y) rdd_wrap(norway2 |> filter(year == y, limit != 0.2), adult_female, 0.5, xlim = c(0.2, 0.8)))
+
+norway0.2_rdd <- set_names(2017:2024) |> 
+  map(\(y) rdd_wrap(norway2 |> filter(year == y, limit == 0.2), adult_female, 0.2, xlim = c(0.1, 0.3))
+  )
+```
+
+```{r}
+#| label: extract-rdd
+
+t_stat <- map(rdds, "jump") |> 
+  map(rdd_extract) |> 
+  list_rbind(names_to = "wherewhen") 
+
+norway_t <- bind_rows(
+`0.5`= map(norway0.5_rdd, "jump") |> 
+  map(rdd_extract) |> 
+  list_rbind(names_to = "year"), 
+
+`0.2` = map(norway0.2_rdd, "jump") |> 
+  map(rdd_extract) |> 
+  list_rbind(names_to = "year"), 
+.id = "limit"
+) |> 
+  mutate(year = as.numeric(year))
+
+# preformat for text
+
+stats_text <- bind_rows(
+    t_stat,
+    norway_t |> filter(limit == 0.5, year %in% c(2012, 2020)) |> mutate(wherewhen = paste0("n_", year))
+  ) 
+stats_text  <- stats_text |> 
+  mutate(T = round(T, 2), p = format.pval(p, digits = 2, eps = 0.001)) |> 
+  purrr::transpose() |> 
+  (\(x)set_names(x, stats_text$wherewhen))() |> 
+  map(\(.x)glue::glue("t = {.x$T}, p = {.x$p}"))
+
+
+```
+
+
+Density discontinuity analysis [#Cattaneo2018] find so evidence of a discontinuity at the regulatory limit in British Columbia (`r stats_text$britishcolumbia`) ([@fig-rdd] A). 
+The Scottish lice data show a significant discontinuity at the regulatory limit (`r stats_text$scotland`) ([@fig-rdd] B). 
+There is no evidence of a discontinuity at the regulatory limit in Norway in 2012 (`r stats_text$n_2012`) ([@fig-rdd] C), but a discontinuity develops in subsequent years [@fig-t-stat] and is large in, for example, 2020 (`r stats_text$n_2020`) ([@fig-rdd] D).
+
+```{r}
+#| label: fig-rdd
+#| fig-cap: >
+#|   Density discontinuity plots for A) British Columbia (2011--2024), B) Scotland (2021-2023), C) Norway 2012, and D) Norway 2020 outside the migration period.  
+#|   Green bars show a histogram of louse counts, black and red lines show the estimated density below and above the regulatory limit respectively, with the uncertainty as a shaded area.  
+
+
+rdds$britishcolumbia$plot$Estplot + 
+  rdds$scotland$plot$Estplot +
+  norway0.5_rdd$`2012`$plot$Estplot +
+  norway0.5_rdd$`2020`$plot$Estplot +
+  plot_annotation(tag_levels = "A") &
+                  theme(plot.tag.location = "plot")
+
+
+```
+
+```{r}
+#| label: fig-t-stat
+#| fig-cap: t-statistics for the density discontinuities at the regulatory limits in Norway for different years. From 2017, the smolt migration season has a lower limit and is shown separately. [#years with positive t-values in have badly fitting models - might be able to fix these#]
+
+norway_t |> 
+  ggplot(aes(x = year, y = T, colour = limit, linetype = limit)) +
+    geom_line() +
+  geom_point(fill = "white", shape = 21) +
+           geom_point(aes(shape = p < 0.05)) + 
+
+  labs(y = "t-statistic for discontinuity", x = "Year", colour = "Lice limit", linetype = "Lice limit") +
+  scale_color_brewer(palette = "Set1") +
+  scale_shape_manual(values = c(1, 16))
+             
+
+```
+
+
 
 ## Discussion
 
 ### Expected distribution of lice counts
 
 The louse count distribution is the result of combining many different distributions for louse counts at different temperatures (fewer lice at colder temperatures), and different fish ages (more lice on older fish), and time since treatment to remove lice.
-The exact shape this combined distribution should take is not known, but the near-exponential decline shown by the Scottish data and the Norwegian data from 2012 seems like a plausible distribution.
+The exact shape this combined distribution should take is not known, but the heavy-tailed monotonic decline shown by data from British Columbia, Scotland, and Norway in 2012 seems like a plausible distribution.
 
 ### Explaining the unexpected patterns in the Norwegian data
 
 The patterns in the Norwegian data are unexpected. 
-There are at least three explanations for the patterns.
+There are at least four explanations for the patterns.
 
-First, Norwegian facilities could have become very good at controlling lice infestations, with the number of lice per fish dropping to near zero at the regulatory limit.
-However the abrupt drop at the limit is not consistent with this explanation as counting uncertainties would result in a smoother decline.
+First, as argued by [#Saevik2023] in response to [#Jeong2023], the sharp drop in lice numbers at the regulatory limit could be due to frequent and effective de-lousing treatments employed by the Norwegian aquaculture industry.
+Such treatments will undoubtedly steepen the curve of the lice count distribution, especially close to and above the regulatory limit, but cannot explain the abrupt drop at the limit because as counting uncertainties would result in a smoother decline. 
+This can be shown by simulating lice counts when the true counts are all strictly below the limit (@fig-count-uncertainty).
+The simulation shows that counting uncertainty will mean that, even in this perfect case, there will not be an abrupt cliff in lice counts and many lice counts will be above the regulatory limit. 
+If the number of lice per fish was simulated with a negative binomial, to allow for over-dispersion, or the fewer fish were inspected, the slope would be even shallower.
+
+[I think the simulation in Saevik2023 cleans immediately the lice count reaches 0.5 lice/fish and then reports after cleaning.]
+
+```{r}
+#| label: fig-count-uncertainty
+#| fig-cap: Lice counts simulated with a Poisson distribution from 10000 surveys with 100 fish examined in each survey. The true lice counts are uniformly distributed between 0 and the regulatory limit of 0.5 lice per fish (denoted with the dashed line). Note that the density discontinuity test does not detect a significant discontinuity in the simulated data. 
+
+set.seed(42)
+nsim <- 10000
+nfish <- 100
+true <- runif(nsim, 0, 0.5)
+
+counted <- tibble(value = rpois(nsim, true * nfish)/nfish) 
+
+ggplot(counted, aes(x = value)) +
+  geom_histogram(
+    binwidth = 0.01,
+    boundary = 0.005
+  ) +
+  geom_vline(xintercept = 0.5, colour = "#99151c", linetype = "dashed") +
+  labs(x = "Simulated number of adult female lice per fish", 
+       y = "Number of surveys") 
+
+rdd_sim <- rdd_wrap(counted, value, 0.5, xlim = c(0.3, 0.7), step = 0.01)
+```
+
+
+
+```{r}
+#| label: optimal-stopping
+set.seed(42)
+
+# simulation
+nsim <- 10000
+true_mean <- 0.5
+threshold <- 0.5
+noriginal <- 50
+nextra <- 10
+
+
+opt_stop_sim <- tibble(
+    true_mean = true_mean,
+    count = rpois(nsim, noriginal * true_mean),
+    extra = rpois(nsim, nextra * true_mean),
+    original = count/noriginal,
+    final = (count + extra)/(noriginal + nextra),
+  ) |> 
+  mutate(final = if_else(original > threshold, final, original)) |> 
+  summarise(mean_original = mean(original), 
+            mean_stop = mean(final),
+            thresh_original = mean(original > threshold) * 100,
+            thresh_original = round(thresh_original, 1),
+            thresh_final = mean(final > threshold) * 100, 
+            thresh_final = round(thresh_final, 1))
+```
+
 
 Second, when a count is above the regulatory limit, the facility could choose to count lice on more fish in the hope that the mean count will drop below the limit.
 This could be portrayed by managers as an attempt to get more accurate data.
-However it is a one-sided bet, as the counts would not be increased to get more accurate data if the count was slightly below the regulatory limit.
-This process would lead to a increase in the number of counts just below the regulatory limit, as observed. 
-Norwegian regulations # require that counts are based on at least twenty fish per pen (ten in winter). 
-Counting extra fish if the louse count is above the regulatory limit is not prohibited, but would bias the mean louse count downwards.
-A correspondent within the Norwegian aquaculture industry confirmed that some companies use this procedure.
+However, if the counts would not be increased when the count was slightly below the regulatory limit, the process with bias the lice count.
+This would lead to a increase in the number of counts just below the regulatory limit, as observed. 
+Norwegian regulations # require that counts are based on _at least_ twenty fish per pen (ten outside of the smolt migration period). 
+Counting extra fish if the louse count is above the regulatory limit is not prohibited.
+A correspondent within the Norwegian aquaculture industry confirmed that some companies use this procedure, but that it is rarely effective.
 It is akin to optional stopping in hypothesis testing, where the sample size is increased if statistical tests are not significant. 
 Optional stopping is a form of p-hacking recognised as a questionable research practice [#Stefan2023] and causes an excess of p-values just below the significance threshold, and a deficit just above.
+The severity of optional stopping for gaming limits depends on the number of times the current count is checked and the number of fish examined between checks [#Stefan2023]. 
+
+To show the effect of optimal stopping, we run a simulation of `r nsim` lice counts. In each count, the lice have a Poisson distribution with a mean of `r true_mean` per fish. If the original count exceeds the regulatory limit of `r threshold` lice per fish, an extra `r nextra` fish are counted and the mean louse count recalculated.
+In a simulation `r opt_stop_sim$thresh_original`% of the original counts exceed the limit, whereas `r opt_stop_sim$thresh_final`% of the counts after optimal stopping exceed the limit. 
 
 Third, facilities with a count above the regulatory limit could immediately treat the fish to remove lice, and then recount the lice, and report the lower post-cleaning count.
 This would lead to a drop in louse counts at the legal limit. 
 The abrupt drop in louse counts suggests that optional stopping or reporting post-treatment counts are widespread in the Norwegian aquaculture industry to the extent that they are standard practice.
-Norwegian regulations require a louse count to be reported each week (every two weeks when the temperature is below X˚C).
+Norwegian regulations require a louse count to be reported each week (every two weeks when the temperature is below 4˚C)
 Nothing in the regulations prohibits recounting lice after treatment.
 
-An alternative explanation that cannot be tested with the available data is that counts are falsified when they are above the regulatory limit.
+Finally, the patterns could be due to data falsification or fabrication. 
+Two such cases have reached Norway's supreme court.
+In 2015, one company with four facilities in northern Norway and its manager was convicted for fabricating and falsifying louse counts over a six month period in 2012--2013#. 
+Although the infestation reached 8.33 adult female lice per fish, the company avoided having to treat the lice by misreporting the louse counts.
+In a previous case#, a manager of a company was convicted of reporting that there were no lice when counts had not been carried out.
+The prevalence of fabrication and falsification is probably low as the penalties for misreporting counts are high and the aquaculture industry not centralised. 
+Thus fabrication and falsification probably explain little of the observed patterns in the Norwegian lice count distribution.
 
 ### Implications
+
+Suggests that facilities attempt to comply with the regulations by treating lice when the limit is exceeded rather than treating in anticipation to prevent the limit being exceeded.
+
+[use lice model to investigate difference in apparent infection pressure and true infection pressure with treat-then-report rather than report-then-treat]
 
 Counts of salmon lice are currently the only metric used by the Norwegian Traffic Light System# to balance the growth of the aquaculture industry with the need to protect wild salmon populations.
 
@@ -182,7 +371,13 @@ If the count data do not reflect the true number of lice, estimates of lice infe
 
 [expand]
 
+Are facilites that count then treat if above limit in compliance with the law?
+
 ### Recommendations
+
+The British Columbia lice counts does not show a discontinuity at the regulatory limit. 
+Aquaculture facilities in the province are regularly audited by the regulator #. 
+[#Godwin2020] showed that lice counts are almost twenty percent higher in audits than in routine counts.
 
 - fix count sizes to prevent optional stopping
 - require that all counts are reported
@@ -192,31 +387,35 @@ If the count data do not reflect the true number of lice, estimates of lice infe
 
 Counts of salmon lice from Norwegian aquaculture facilities do not fully reflect the true number of lice as two procedures are used to artificially deflate the counts when they are above the regulatory limit
 
+## Acknowledgements
+
+So long, and thanks for all the fish.
+
+## Data availability
+
+All data are publicly available from the regulars in Norway, Scotland, and British Columbia. 
+Code to reproduce this manuscript is available from  https://github.com/richardjtelford/lice-at-the-limit
+
+
 ## References
 
 https://link.springer.com/article/10.1007/s10499-023-01270-w
 
 https://royalsocietypublishing.org/doi/10.1098/rsos.220346
 
+https://esajournals.onlinelibrary.wiley.com/doi/10.1002/eap.2226
+
+https://www.domstol.no/globalassets/upload/hret/avgjorelser/2016/avgjorelser-desember-2016/sak-2016-1391.pdf
+
+https://www.domstol.no/globalassets/upload/hret/avgjorelser/2015/saknr-2014-1689.pdf
+
+FOR-2012-12-05-1140 https://lovdata.no/dokument/SF/forskrift/2012-12-05-1140
+
 ::: {#refs}
 :::
 
 
-```{r}
-#| eval: false
-# simulate
 
-prob <- 0.5
-nfish <- 20
-npens <- 1:10
-nrep <- 1000
-
-crossing(true_mean = seq(0.05, 1, 0.1), nfish = c(20, 200)) |> 
-  mutate(exceedance_prob = 1- ppois(0.5 * nfish, lambda = true_mean * nfish)) |> 
-  ggplot(aes(x = true_mean, y = exceedance_prob, colour = factor(nfish))) +
-  geom_line()
-
-```
 
 
 
