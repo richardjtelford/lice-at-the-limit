@@ -37,11 +37,15 @@ library(tidyverse)
 library(patchwork)
 library(here)
 library(conflicted)
-library(pakret)
+
 library(rddensity)
 library(gt)
 library(glue)
 conflict_prefer_all("dplyr", quiet = TRUE)
+
+# packages used in the document
+library(targets)
+library(pakret)
 
 # set default ggplot theme
 theme_set(theme_bw())
@@ -53,13 +57,14 @@ source(here("R/functions.R"))
 ## Introduction
 
 Regulations impose a burden on the regulated. 
-There is a cost to compliance that companies will seek to minimise by developing efficient procedures, by subverting the regulations, or by breaching them if the penalties are low or enforcement is weak. 
-If subversion is widespread, regulations may fail to reach their objectives even though all parties are apparently fully complying.
+There is a cost to compliance that companies will seek to minimise by developing efficient procedures, by circumventing the regulations, or by breaching them if the penalties are low or enforcement is weak.
+If circumvention is widespread, regulations may fail to reach their objectives even though all parties are apparently fully complying.
 
 Polluting industries are often regulated by imposing limits emissions. [acid rain, CO2, nuclear discharge, sewerage works, etc etc].
-
 A special case of a polluting industry is the aquaculture industry. 
-In temperate and sub-polar coastal waters, salmon farms are a major economic x with worldwide revenues of $xxxx, release xxx into the water. 
+In cool temperate and sub-polar coastal waters, salmon farms are a major economic concern with worldwide revenues of $xxxx #. 
+Most farmed salmon are raised in open net pens which release pharmaceutical products and organic waste into the water #. 
+These emissions are regulated #.
 
 In addition, the farmed salmon host _Lepeophtheirus salmonis_, the salmon louse, an ectoparasitic copepod that infests salmonoid fish causing welfare problems# and economic losses# in the aquaculture industry. 
 The farms release lice eggs into the environment where they can infest wild salmonoid fish#. 
@@ -76,20 +81,20 @@ tribble(
   ~Country, ~Period, ~"Limit per fish", 
   "British Columbia, Canada", "????", "3 motile lice", 
   "Ireland", "2008-", "0.5 egg-bearing lice during the smolt out-migration, 2 otherwise",
-  "Scotland", "2021-", "2 adult female lice triggers increases monitoring, 6 requires treatment",
   "Norway", "2009-2012", "1 adult female lice, or 5 motile lice", 
   "Norway", "2013-2016", "0.5 adult female lice", 
-  "Norway", "2017-", "0.2 adult female lice during smolt out-migration, 0.5 otherwise") |> 
+  "Norway", "2017-", "0.2 adult female lice during smolt out-migration, 0.5 otherwise", 
+  "Scotland", "2021-", "2 adult female lice triggers increases monitoring, 6 requires treatment") |> 
   gt() |> 
   cols_width(starts_with("Limit") ~ px(260))
 ```
 
 Jeong et al. [-@Jeong2023] reported that in Norway, but not in British Columbia, the distribution of louse counts has an unexpected "cliff" at the regulatory limit.
-Jeong et al. [-@Jeong2023] ascribe this "cliff" to a desire by aquaculture managers to report values below the regulatory limits, but do not identify a mechanism by which they could do this. 
+Jeong et al. [-@Jeong2023] ascribe this "cliff" to a desire by aquaculture managers to report values below the regulatory limits, but do not identify the mechanisms by which they could do this. 
 Sævik and Sandvik [-@Saevik2023] dispute this interpretation, arguing that the "cliff" is due to efficient lice treatment in Norway.
 
 In this paper, we aim to extend the analysis of Jeong et al. [-@Jeong2023] to other countries with farmed and wild salmonoids.
-We test if there is a "cliff" or discontinuity in the louse counts distribution at the regulatory limit and try to explain it by natural processes or due to the regulations being subverted.
+We test if there is a "cliff" or discontinuity in the louse counts distribution at the regulatory limit and try to explain it by natural processes or due to the regulations being circumvented.
 
 
 ## Methods
@@ -123,7 +128,7 @@ period <- list(
 
 
 We examine the distribution of the mean louse counts reported by the aquaculture facilities to the national regulators using publicly available data.
-Lice count data were downloaded from the regulators in British Columbia, (Canada) (`r period$britishcolumbia`), Ireland (), Norway (`r period$norway`), and Scotland (`r period$scotland`).
+Lice count data were downloaded from the regulators in British Columbia, (Canada) (`r period$britishcolumbia`) [#], Ireland () [#], Norway (`r period$norway`) [#barentswatch], and Scotland (`r period$scotland`) [#].
 
 We test for discontinuities at the regulatory limits using the `r pkrt("rddensity")` package.
 All analyses were done in `r pkrt("R")`. 
@@ -393,7 +398,11 @@ If the count data do not reflect the true number of lice, estimates of lice infe
 
 Are facilites that count then treat if above limit in compliance with the law?
 
-Who uses barrentswatch data... check citations. classify into groups
+Norwegian salmon louse counts from #barentswatch are widely used.  Who uses barrentswatch data... check citations. classify into groups
+
+lice infestion pressure, lice-induced mortality of wild salmon
+
+Stige2022 drive their models lice-induced mortality of wild salmon with louse count data. 
 
 ### Recommendations
 
@@ -435,7 +444,15 @@ J. Fish Dis., 36 (2013), pp. 241-247
 
 
 
+Skilbrei OT, Heino M, Svåsand T. (2015) Using simulated escape events to assess the annual numbers and
+destinies of escaped farmed Atlantic salmon of different life stages, from farms sites in Norway. ICES Journal of
+Marine Science, 72 : 670–685.
+https://doi.org/10.1093/icesjms/fsu133
 
 
+Fate and effects of fish farm organic waste in marine systems: Advances in understanding using biochemical approaches with implications for environmental management
+Deanna M. Elvines, Catriona K. MacLeod, Donald. J. Ross, Grant A. Hopkins, Camille A. White
+First published: 05 April 2023
+https://doi.org/10.1111/raq.12821
 
-
+https://doi.org/10.3354/aei00443 Stige2022
