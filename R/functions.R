@@ -8,7 +8,7 @@ rdd_wrap <- function(.data, count_var, limit, xlim = c(0, 5), step = 0.01, xlabe
   jump <-  rddensity(counts, c = limit, p = 3)
 
   xlim <- c(xlim[1] + step/2, xlim[2] - step/2)
-  plot <- rdplotdensity(jump, counts, plotRange = xlim, histBreaks = seq(xlim[1], xlim[2], by = step), noPlot = TRUE, ylabel = "Number of surveys", xlabel = xlabel, histFillShade = 0.7, ...)
+  plot <- rdplotdensity(jump, counts, plotRange = xlim, histBreaks = seq(xlim[1], xlim[2], by = step), noPlot = TRUE, ylabel = "Density", xlabel = xlabel, histFillShade = 0.7, ...)
 
   list(jump = jump, plot = plot)
 

@@ -28,30 +28,22 @@ bibliography:
 #csl: aquaculture-international.csl
 execute:
   echo: false
+  error: true
 ---
 
 ```{r}
 #| label: setup
 #| message: false
-library(tidyverse)
-library(patchwork)
-library(here)
-library(conflicted)
-
-library(rddensity)
-library(gt)
-library(glue)
-conflict_prefer_all("dplyr", quiet = TRUE)
 
 # packages used in the document
 library(targets)
 library(pakret)
+library(gt)
+library(ggplot2) # just to set themes
+
 
 # set default ggplot theme
 theme_set(theme_bw())
-
-# source functions
-source(here("R/functions.R"))
 ```
 
 ## Introduction
@@ -77,7 +69,7 @@ In most jurisdictions, these louse counts are publicly available.
 ```{r}
 #| label: tbl-regulations
 #| tbl-cap: "Regulatory limits on the number of adult lice per fish."
-tribble(
+tibble::tribble(
   ~Country, ~Period, ~"Limit per fish", 
   "British Columbia, Canada", "????", "3 motile lice", 
   "Ireland", "2008-", "0.5 egg-bearing lice during the smolt out-migration, 2 otherwise",
@@ -100,35 +92,15 @@ We test if there is a "cliff" or discontinuity in the louse counts distribution 
 ## Methods
 
 ```{r}
-#| label: load_data
-#| message: false
-
-norway <- readxl::read_excel(here("data/norway/lakselus_per_fisk.xlsx")) |> 
-  janitor::clean_names() 
-
-scotland <- read_delim(here("data/scotland/ms_sea_lice.zip")) |> 
-  janitor::clean_names()
-
-britishcolumbia <- read_delim(here("data/british-columbia/lice-count-dens-pou-2011-ongoing-rpt-pac-dfo-mpo-aquaculture-eng.csv"), na = "n/a") |> 
-  janitor::clean_names()
-
-ireland <- NULL
-```
-
-```{r}
 #| label: period
 
-period <- list(
-  britishcolumbia = glue("{min(britishcolumbia$year)}--{max(britishcolumbia$year)}"),
-  scotland = glue("{min(scotland$year)}--{max(scotland$year)}"),
-  norway = glue("{min(norway$ar)}--{max(norway$ar)}")
-)
+tar_load(periods)
 
 ```
 
 
 We examine the distribution of the mean louse counts reported by the aquaculture facilities to the national regulators using publicly available data.
-Lice count data were downloaded from the regulators in British Columbia, (Canada) (`r period$britishcolumbia`) [#], Ireland () [#], Norway (`r period$norway`) [#barentswatch], and Scotland (`r period$scotland`) [#].
+Lice count data were downloaded from the regulators in British Columbia, (Canada) (`r periods$britishColumbia`) [#], Ireland (`r periods$ireland`) [#], Norway (`r periods$norway`) [#barentswatch], and Scotland (`r periods$scotland`) [#].
 
 We test for discontinuities at the regulatory limits using the `r pkrt("rddensity")` package.
 All analyses were done in `r pkrt("R")`. 
@@ -139,31 +111,7 @@ Code to reproduce the analyses is available from https://github.com/richardjtelf
 
 # Results
 
-```{r}
-#| label: select-data-for-plot
-#| warning: false
 
-scotland2 <- scotland |> 
-  select(year, week = week_no, adult_female = weekly_average_af) |>
-  mutate(group = glue::glue("Scotland {min(year)}-{max(year)}"), 
-         limit = 2) 
-
-norway2 <- norway |> 
-  select(year = ar, week = uke, adult_female = voksne_hunnlus, limit = lusegrense_uke) |> 
-  mutate(group = case_when(
-    year == 2012 ~ "Norway 2012",
-    between(year, 2017, 2024) & limit == 0.2 ~ "Norway 2017-2024 during smolt migration",
-    between(year, 2017, 2024) & limit == 0.5 ~ "Norway 2017-2024 outside smolt migration",
-    between(year, 2013, 2016) & limit == 0.5 ~ "Norway 2013-2016",
-    .default = "other"
-  )) |> 
-  filter(group != "other") |> 
-  mutate(limit = as.numeric(limit)) # NA warning from 2012 data
-
-plot_data <- bind_rows(scotland2, norway2) |>
-  mutate(group = factor(group, levels = c("Scotland 2021-2023", "Norway 2012", "Norway 2013-2016", "Norway 2017-2024 during smolt migration", "Norway 2017-2024 outside smolt migration")))
-
-```
 
 
 ```{r}
@@ -172,19 +120,11 @@ plot_data <- bind_rows(scotland2, norway2) |>
 #| fig-height: 5
 #| warning: false
 
-lice_hist <- plot_data |> 
-  filter(group %in% c("Scotland 2021-2023", "Norway 2012", "Norway 2013-2016", "Norway 2017-2024 outside smolt migration")) |> 
-  filter(adult_female > 0) |> 
-  ggplot(aes(x = adult_female)) +
-  geom_vline(aes(xintercept = limit), colour = "#99151c", linetype = "dashed") +
-  geom_histogram(binwidth = 0.01, boundary = 0.005) +
-  scale_x_continuous(expand = c(0.01, 0.01)) +
-  coord_cartesian(xlim = c(0, 3)) +
-  facet_wrap(facets = vars(group), scales = "free_y", ncol = 2) +
-  labs(x = "Mean number of adult female lice per fish", ylab = "Number of surveys")
-
-lice_hist
+tar_read(lice_hist)
 ```
+
+
+
 The Scottish data and the Norwegian data from 2012 shows a heavy-tailed, monotonic decline in louse counts [@fig-hist].
 The spikes in the data either reflect rounding or many counts being based on 20 fish.
 The spikes do not affect the rest of the analysis.
@@ -193,53 +133,10 @@ The data from outside the smolt migration period show a small rise in counts jus
 Histograms from 2013-2016 are transitional between the patterns shown in 2012 and post-2017.
 
 ```{r}
-#| label: run-rdd
-rdds <- list(
-  scotland = rdd_wrap(scotland2, adult_female, 2, xlim = c(1.5, 2.5), step = 0.02), #
-  britishcolumbia = rdd_wrap(britishcolumbia, average_l_salmonis_motiles_per_fish, 3, xlim = c(2.5, 3.5), step = 0.02, xlabel = "Number of Motile Lice")
-  )
-
-norway0.5_rdd <- set_names(2012:2024) |> 
-  map(\(y) rdd_wrap(norway2 |> filter(year == y, limit != 0.2), adult_female, 0.5, xlim = c(0.2, 0.8)))
-
-norway0.2_rdd <- set_names(2017:2024) |> 
-  map(\(y) rdd_wrap(norway2 |> filter(year == y, limit == 0.2), adult_female, 0.2, xlim = c(0.1, 0.3))
-  )
+#| label: load-stats-text
+tar_load(stats_text)
 ```
 
-```{r}
-#| label: extract-rdd
-
-t_stat <- map(rdds, "jump") |> 
-  map(rdd_extract) |> 
-  list_rbind(names_to = "wherewhen") 
-
-norway_t <- bind_rows(
-`0.5`= map(norway0.5_rdd, "jump") |> 
-  map(rdd_extract) |> 
-  list_rbind(names_to = "year"), 
-
-`0.2` = map(norway0.2_rdd, "jump") |> 
-  map(rdd_extract) |> 
-  list_rbind(names_to = "year"), 
-.id = "limit"
-) |> 
-  mutate(year = as.numeric(year))
-
-# preformat for text
-
-stats_text <- bind_rows(
-    t_stat,
-    norway_t |> filter(limit == 0.5, year %in% c(2012, 2020)) |> mutate(wherewhen = paste0("n_", year))
-  ) 
-stats_text  <- stats_text |> 
-  mutate(T = round(T, 2), p = format.pval(p, digits = 2, eps = 0.001)) |> 
-  purrr::transpose() |> 
-  (\(x)set_names(x, stats_text$wherewhen))() |> 
-  map(\(.x)glue::glue("t = {.x$T}, p = {.x$p}"))
-
-
-```
 
 
 Density discontinuity analysis [@Cattaneo2018] finds evidence of a discontinuity at the regulatory limit in British Columbia (`r stats_text$britishcolumbia`) ([@fig-rdd] A). 
@@ -252,13 +149,7 @@ There is no evidence of a discontinuity at the regulatory limit in Norway in 201
 #|   Density discontinuity plots for A) British Columbia (2011--2024), B) Scotland (2021-2023), C) Norway 2012, and D) Norway 2020 outside the migration period.  
 #|   Green bars show a histogram of louse counts, black and red lines show the estimated density below and above the regulatory limit respectively, with the uncertainty as a shaded area.  
 
-
-rdds$britishcolumbia$plot$Estplot + 
-  rdds$scotland$plot$Estplot +
-  norway0.5_rdd$`2012`$plot$Estplot +
-  norway0.5_rdd$`2020`$plot$Estplot +
-  plot_annotation(tag_levels = "A") &
-                  theme(plot.tag.location = "plot")
+tar_read(rdds_plots)
 
 
 ```
@@ -267,17 +158,7 @@ rdds$britishcolumbia$plot$Estplot +
 #| label: fig-t-stat
 #| fig-cap: t-statistics for the density discontinuities at the regulatory limits in Norway for different years. From 2017, the smolt migration season has a lower limit and is shown separately. [#years with positive t-values in have badly fitting models - might be able to fix these#]
 
-norway_t |> 
-  ggplot(aes(x = year, y = T, colour = limit, linetype = limit)) +
-    geom_line() +
-  geom_point(fill = "white", shape = 21) +
-           geom_point(aes(shape = p < 0.05)) + 
-
-  labs(y = "t-statistic for discontinuity", x = "Year", colour = "Lice limit", linetype = "Lice limit") +
-  scale_color_brewer(palette = "Set1") +
-  scale_shape_manual(values = c(1, 16))
-             
-
+tar_read(norway_t_plot)
 ```
 
 
@@ -306,53 +187,13 @@ If the number of lice per fish was simulated with a negative binomial, to allow 
 #| label: fig-count-uncertainty
 #| fig-cap: Lice counts simulated with a Poisson distribution from 10000 surveys with 100 fish examined in each survey. The true lice counts are uniformly distributed between 0 and the regulatory limit of 0.5 lice per fish (denoted with the dashed line). Note that the density discontinuity test does not detect a significant discontinuity in the simulated data. 
 
-set.seed(42)
-nsim <- 10000
-nfish <- 100
-true <- runif(nsim, 0, 0.5)
-
-counted <- tibble(value = rpois(nsim, true * nfish)/nfish) 
-
-ggplot(counted, aes(x = value)) +
-  geom_histogram(
-    binwidth = 0.01,
-    boundary = 0.005
-  ) +
-  geom_vline(xintercept = 0.5, colour = "#99151c", linetype = "dashed") +
-  labs(x = "Simulated number of adult female lice per fish", 
-       y = "Number of surveys") 
-
-rdd_sim <- rdd_wrap(counted, value, 0.5, xlim = c(0.3, 0.7), step = 0.01)
+tar_read(count_uncertainty)
 ```
-
 
 
 ```{r}
 #| label: optimal-stopping
-set.seed(42)
-
-# simulation
-nsim <- 10000
-true_mean <- 0.5
-threshold <- 0.5
-noriginal <- 50
-nextra <- 10
-
-
-opt_stop_sim <- tibble(
-    true_mean = true_mean,
-    count = rpois(nsim, noriginal * true_mean),
-    extra = rpois(nsim, nextra * true_mean),
-    original = count/noriginal,
-    final = (count + extra)/(noriginal + nextra),
-  ) |> 
-  mutate(final = if_else(original > threshold, final, original)) |> 
-  summarise(mean_original = mean(original), 
-            mean_stop = mean(final),
-            thresh_original = mean(original > threshold) * 100,
-            thresh_original = round(thresh_original, 1),
-            thresh_final = mean(final > threshold) * 100, 
-            thresh_final = round(thresh_final, 1))
+tar_load(optimal_stopping)
 ```
 
 
@@ -367,8 +208,8 @@ It is akin to optional stopping in hypothesis testing, where the sample size is 
 Optional stopping is a form of p-hacking recognised as a questionable research practice [@Stefan2023] and causes an excess of p-values just below the significance threshold, and a deficit just above.
 The severity of optional stopping for gaming limits depends on the number of times the current count is checked and the number of fish examined between checks [@Stefan2023]. 
 
-To show the effect of optimal stopping, we run a simulation of `r nsim` lice counts. In each count, the lice have a Poisson distribution with a mean of `r true_mean` per fish. If the original count exceeds the regulatory limit of `r threshold` lice per fish, an extra `r nextra` fish are counted and the mean louse count recalculated.
-In a simulation `r opt_stop_sim$thresh_original`% of the original counts exceed the limit, whereas `r opt_stop_sim$thresh_final`% of the counts after optimal stopping exceed the limit. 
+To show the effect of optimal stopping, we run a simulation of `r optimal_stopping$nsim` lice counts. In each count, the lice have a Poisson distribution with a mean of `r optimal_stopping$true_mean` per fish. If the original count on `r optimal_stopping$noriginal` fish exceeded the regulatory limit of `r optimal_stopping$threshold` lice per fish, an extra `r optimal_stopping$nextra` fish are counted and the mean louse count recalculated.
+In a simulation `r optimal_stopping$thresh_original`% of the original counts exceed the limit, whereas `r optimal_stopping$thresh_final`% of the counts after optimal stopping exceed the limit. 
 
 Third, facilities with a count above the regulatory limit could immediately treat the fish to remove lice, and then recount the lice, and report the lower post-cleaning count.
 This would lead to a drop in louse counts at the legal limit. 
