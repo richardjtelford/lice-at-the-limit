@@ -2,7 +2,8 @@
 run_rdd <- function(all_data) {
   rdds <- list(
     scotland = rdd_wrap(all_data$scotland, lice, 2, xlim = c(1.5, 2.5), step = 0.02), #
-    britishColumbia = rdd_wrap(all_data$britishColumbia, lice, 3, xlim = c(2.5, 3.5), step = 0.02, xlabel = "Number of Motile Lice")
+    britishColumbia = rdd_wrap(all_data$britishColumbia, lice, 3, xlim = c(2.5, 3.5), step = 0.02, xlabel = "Number of Motile Lice"),
+    ireland = rdd_wrap(all_data$ireland |> filter(limit == 0.5), lice, 0.5, xlim = c(0.2, 0.8), step = 0.01, xlabel = "Gravid female lice")
   )
 
   norway0.5 <- set_names(2012:2024) |>

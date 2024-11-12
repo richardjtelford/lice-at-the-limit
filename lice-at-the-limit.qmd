@@ -139,9 +139,9 @@ tar_load(stats_text)
 
 
 
-Density discontinuity analysis [@Cattaneo2018] finds evidence of a discontinuity at the regulatory limit in British Columbia (`r stats_text$britishcolumbia`) ([@fig-rdd] A). 
-The Scottish lice data show a significant discontinuity at the regulatory limit (`r stats_text$scotland`) ([@fig-rdd] B). 
-There is no evidence of a discontinuity at the regulatory limit in Norway in 2012 (`r stats_text$n_2012`) ([@fig-rdd] C), but a discontinuity develops in subsequent years [@fig-t-stat] and is large in, for example, 2020 (`r stats_text$n_2020`) ([@fig-rdd] D).
+Density discontinuity analysis [@Cattaneo2018] finds no evidence of a discontinuity at the regulatory limit in British Columbia (`r stats_text$britishColumbia`) ([@fig-rdd]A) or in Ireland  (`r stats_text$ireland`) during the smolt migration season. 
+The Scottish lice data show a significant discontinuity at the regulatory limit (`r stats_text$scotland`) ([@fig-rdd]B). 
+There is no evidence of a discontinuity at the regulatory limit in Norway in 2012 (`r stats_text$n_2012`) ([@fig-rdd]C), but a discontinuity develops in subsequent years [@fig-t-stat] and is large in, for example, 2020 (`r stats_text$n_2020`) ([@fig-rdd]D).
 
 ```{r}
 #| label: fig-rdd
@@ -176,8 +176,9 @@ The patterns in the Norwegian data are unexpected.
 There are at least four explanations for the patterns.
 
 First, as argued by Sævik and Sandvik [-@Saevik2023] in response to Jeong et al. [-@Jeong2023], the sharp drop in lice numbers at the regulatory limit could be due to frequent and effective de-lousing treatments employed by the Norwegian aquaculture industry.
-Such treatments will undoubtedly steepen the curve of the lice count distribution, especially close to and above the regulatory limit, but cannot explain the abrupt drop at the limit because as counting uncertainties would result in a smoother decline. 
-This can be shown by simulating lice counts when the true counts are all strictly below the limit (@fig-count-uncertainty).
+Such treatments will undoubtedly steepen the curve of the lice count distribution, especially close to and above the regulatory limit, but cannot explain the abrupt drop at the limit because counting uncertainties would result in a smoother decline. 
+This mechanism also does not explain the absence of a discontinuity in the Irish lice counts, where the regulatory limits are similar to Norway.
+The effect of counting uncertainty can be shown by simulating lice counts when the true counts are all strictly below the limit (@fig-count-uncertainty).
 The simulation shows that counting uncertainty will mean that, even in this perfect case, there will not be an abrupt cliff in lice counts and many lice counts will be above the regulatory limit. 
 If the number of lice per fish was simulated with a negative binomial, to allow for over-dispersion, or the fewer fish were inspected, the slope would be even shallower.
 

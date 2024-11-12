@@ -39,7 +39,7 @@ list(
   ),
   tar_target(
     name = ireland_file,
-    command = here("data/ireland/Lice_sites_2001_2023.xlsx"),
+    command = file.path("data/ireland/pdf", list.files(here::here("data/ireland/pdf/"), pattern = "\\.pdf$", recursive = TRUE)),
     format = "file"
   ),
 
