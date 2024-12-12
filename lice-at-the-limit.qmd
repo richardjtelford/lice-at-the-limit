@@ -1,5 +1,5 @@
 ---
-title: "Lice at the limits: impact of regulatory limits on lice counts in salmon farms"
+title: "Lice at the limits: impact of regulatory limits on salmon lice counts in aquaculture facilities"
 author:
   - name: Richard J Telford
     orcid: 0000-0001-9826-3076
@@ -22,10 +22,16 @@ abstract: >
   on the number of lice per fish. 
   These features are consistent with aquaculture facilities taking advantage of 
   loopholes in the regulations to penalties associated with exceeding those limits.
+keywords:
+  - Salmon lice
+  - Traffic light system
+  - regulations
+  - circumvention
+  - aquaculture
 bibliography:
   - pakret.bib
   - lice.bib
-#csl: aquaculture-international.csl
+csl: aquaculture-international.csl
 execute:
   echo: false
   error: true
@@ -49,44 +55,45 @@ theme_set(theme_bw())
 ## Introduction
 
 Regulations impose a burden on the regulated. 
-There is a cost to compliance that companies will seek to minimise by developing efficient procedures, by circumventing the regulations, or by breaching them if the penalties are low or enforcement is weak.
-If circumvention is widespread, regulations may fail to reach their objectives even though all parties are apparently fully complying.
+Companies will seek to minimise the cost of compliance by developing efficient procedures #, by circumventing the regulations #, fraudulently claiming to comply [@Jung2019], or by breaching them if the penalties are low or enforcement is weak #.
+If circumvention is widespread, regulations may fail to reach their objectives even though all parties are apparently fully complying [@Kakade2021].
+More onerous regulations further increase the cost of compliance and risk higher levels of non-compliance #.
 
-Polluting industries are often regulated by imposing limits emissions. [acid rain, CO2, nuclear discharge, sewerage works, etc etc].
-A special case of a polluting industry is the aquaculture industry. 
-In cool temperate and sub-polar coastal waters, salmon farms are a major economic concern with worldwide revenues of $xxxx #. 
-Most farmed salmon are raised in open net pens which release pharmaceutical products and organic waste into the water #. 
-These emissions are regulated #.
 
-In addition, the farmed salmon host _Lepeophtheirus salmonis_, the salmon louse, an ectoparasitic copepod that infests salmonoid fish causing welfare problems# and economic losses# in the aquaculture industry. 
-The farms release lice eggs into the environment where they can infest wild salmonoid fish#. 
-Salmon lice released by the aquaculture industry is thought to be one of the drivers of decreasing wild salmon populations# alongside climate change xxx #.
+In common with many polluting industries, emissions from the aquaculture industry are regulated.
+Open net pen salmon farms release pharmaceutical products [@CasaResino2021], heavy metals [@Burridge2010], and organic waste # into the environment.
+In addition, farmed salmon host disease and parasites can be released into the environment and harm wild fish [@Krkosek2024].
 
+A parasite of particular concern is the salmon louse, _Lepeophtheirus salmonis_, an ectoparasitic copepod that infests salmonoid fish causing welfare issues and economic losses in the aquaculture industry [@Abolofia2017]. 
+Salmon lice released by the aquaculture industry are thought to be one of the drivers of decreasing wild salmon populations# alongside climate change xxx #.
 Consequently, countries with salmon farming have established regulatory frameworks to control lice infestations [@Vormedal2023]. 
-These regulations focus on the mean number of adult lice per fish [@tbl-regulations] which are measured regularly and reported to the regulators.
-In most jurisdictions, these louse counts are publicly available.
+The severity of the regulations, which focus on the mean number of adult lice per fish [@tbl-regulations], varies between countries, and has changed over time.
+
 
 ```{r}
 #| label: tbl-regulations
 #| tbl-cap: "Regulatory limits on the number of adult lice per fish."
 tibble::tribble(
-  ~Country, ~Period, ~"Limit per fish", 
-  "British Columbia, Canada", "????", "3 motile lice", 
-  "Ireland", "2008-", "0.5 egg-bearing lice during the smolt out-migration, 2 otherwise",
-  "Norway", "2009-2012", "1 adult female lice, or 5 motile lice", 
-  "Norway", "2013-2016", "0.5 adult female lice", 
-  "Norway", "2017-", "0.2 adult female lice during smolt out-migration, 0.5 otherwise", 
-  "Scotland", "2021-", "2 adult female lice triggers increases monitoring, 6 requires treatment") |> 
+  ~Country, ~Period, ~"Limit per fish", ~"Self-reported",
+  "British Columbia, Canada", "????", "3 motile lice", "Yes, with audits",
+  "Ireland", "2008-", "0.5 egg-bearing lice during the smolt out-migration, 2 otherwise", "No",
+  "Norway", "2009-2012", "1 adult female lice, or 5 motile lice", "Yes",
+  "Norway", "2013-2016", "0.5 adult female lice", "Yes",
+  "Norway", "2017-", "0.2 adult female lice during smolt out-migration, 0.5 otherwise", "Yes",
+  "Scotland", "2021-", "2 adult female lice triggers increases monitoring, 6 requires treatment", "Yes") |> 
   gt() |> 
   cols_width(starts_with("Limit") ~ px(260))
 ```
 
-Jeong et al. [-@Jeong2023] reported that in Norway, but not in British Columbia, the distribution of louse counts has an unexpected "cliff" at the regulatory limit.
+
+In this paper, we explore how compliance with louse regulations by the aquaculture industry is affected by the severity of the regulations and whether the louse counts are self-reported or conducted by the regulator.
+This analysis builds upon the work of Jeong et al. [-@Jeong2023] who reported that in Norway the distribution of louse counts has an unexpected "cliff" at the regulatory limit.
+Data from British Columbia, Canada did not show this "cliff".
 Jeong et al. [-@Jeong2023] ascribe this "cliff" to a desire by aquaculture managers to report values below the regulatory limits, but do not identify the mechanisms by which they could do this. 
 Sævik and Sandvik [-@Saevik2023] dispute this interpretation, arguing that the "cliff" is due to efficient lice treatment in Norway.
-
-In this paper, we aim to extend the analysis of Jeong et al. [-@Jeong2023] to other countries with farmed and wild salmonoids.
-We test if there is a "cliff" or discontinuity in the louse counts distribution at the regulatory limit and try to explain it by natural processes or due to the regulations being circumvented.
+We extend this analysis to other countries with farmed and wild salmonoids, 
+testing if there is a "cliff" or discontinuity in the louse counts distribution at the regulatory limit and try to explain it by natural processes or due to the regulations being circumvented. 
+We then compare the prevalence of non-compliance with the severity of the regulations.
 
 
 ## Methods
@@ -100,17 +107,25 @@ tar_load(periods)
 
 
 We examine the distribution of the mean louse counts reported by the aquaculture facilities to the national regulators using publicly available data.
-Lice count data were downloaded from the regulators in British Columbia, (Canada) (`r periods$britishColumbia`) [#], Ireland (`r periods$ireland`) [#], Norway (`r periods$norway`) [#barentswatch], and Scotland (`r periods$scotland`) [#].
+Lice count data were downloaded from the regulators in British Columbia, (Canada) (`r periods$britishColumbia`) [@FOC2024], Ireland (`r periods$ireland`) [@MarineInstitute20082024], Norway (`r periods$norway`) [@Barentswatch2024], and Scotland (`r periods$scotland`) [@SEPA2024].
 
 We test for discontinuities at the regulatory limits using the `r pkrt("rddensity")` package.
 All analyses were done in `r pkrt("R")`. 
 Code to reproduce the analyses is available from https://github.com/richardjtelford/lice-at-the-limit
 
 
-
-
 # Results
 
+```{r}
+#| label: fig-compliance
+#| fig-cap: Proportion of louse counts that are below the regulatory limit for the different countries against time.
+#| fig-height: 4.5
+
+tar_read(fig_compliance_plot)
+```
+
+The proportion of lice counts that are comply with the regulations [@fig-compliance] is high and increasing in Ireland and Norway, but somewhat lower and more varied in British Columbia.
+The Scottish record is too short to meaningfully address trends.
 
 
 
@@ -168,7 +183,9 @@ tar_read(norway_t_plot)
 ### Expected distribution of lice counts
 
 The louse count distribution is the result of combining many different distributions for louse counts at different temperatures (fewer lice at colder temperatures), and different fish ages (more lice on older fish), and time since treatment to remove lice.
-The exact shape this combined distribution should take is not known, but the heavy-tailed monotonic decline shown by data from British Columbia, Scotland, and Norway in 2012 seems like a plausible distribution.
+The exact shape this combined distribution should take is not known, but the heavy-tailed monotonic decline shown by data from British Columbia, Ireland, Scotland, and Norway in 2012 seems like a plausible distribution. 
+The Ireland data are especially interesting as the regulator is responsible for counting the lice #. 
+In British Columbia, facilities are regularly audited to ensure that the counts are performed correctly #.
 
 ### Explaining the unexpected patterns in the Norwegian data
 
@@ -182,7 +199,9 @@ The effect of counting uncertainty can be shown by simulating lice counts when t
 The simulation shows that counting uncertainty will mean that, even in this perfect case, there will not be an abrupt cliff in lice counts and many lice counts will be above the regulatory limit. 
 If the number of lice per fish was simulated with a negative binomial, to allow for over-dispersion, or the fewer fish were inspected, the slope would be even shallower.
 
-[I think the simulation in Saevik2023 cleans immediately the lice count reaches 0.5 lice/fish and then reports after cleaning.]
+Sævik and Sandvik [-@Saevik2023] simulate lice population growth and treatment to generate data that resembles the data shown by Jeong et al. [-@Jeong2023].
+In their simulation, once the lice abundance exceeds the regulatory limit, there is a 90% probability that the fish are cleaned with with an efficacy of 0.9. 
+This is identical to the third mechanism we propose.
 
 ```{r}
 #| label: fig-count-uncertainty
@@ -213,43 +232,63 @@ To show the effect of optimal stopping, we run a simulation of `r optimal_stoppi
 In a simulation `r optimal_stopping$thresh_original`% of the original counts exceed the limit, whereas `r optimal_stopping$thresh_final`% of the counts after optimal stopping exceed the limit. 
 
 Third, facilities with a count above the regulatory limit could immediately treat the fish to remove lice, and then recount the lice, and report the lower post-cleaning count.
-This would lead to a drop in louse counts at the legal limit. 
-The abrupt drop in louse counts suggests that optional stopping or reporting post-treatment counts are widespread in the Norwegian aquaculture industry to the extent that they are standard practice.
-Norwegian regulations require a louse count to be reported each week (every two weeks when the temperature is below 4˚C) [@sealicelaw2012].
-Nothing in the regulations prohibits recounting lice after treatment.
+This would lead to a discontinuity in louse counts at the legal limit. 
+
+
+The size of the discontinuity in louse counts suggests that reporting post-treatment counts is widespread in the Norwegian aquaculture industry to the extent that it are standard practice.
+A representative of one of the main aquaculture companies confirmed this.
+
+
+
 
 Finally, the patterns could be due to data falsification or fabrication. 
 Two such cases have reached Norway's supreme court.
-In 2015, one company with four facilities in northern Norway and its manager was convicted for fabricating and falsifying louse counts over a six month period in 2012--2013#. 
+In 2015, one company with four facilities in northern Norway and its manager was convicted for fabricating and falsifying louse counts over a six month period in 2012--2013 [@NorgesHoeyesterett2016]. 
 Although the infestation reached 8.33 adult female lice per fish, the company avoided having to treat the lice by misreporting the louse counts.
-In a previous case#, a manager of a company was convicted of reporting that there were no lice when counts had not been carried out.
-The prevalence of fabrication and falsification is probably low as the penalties for misreporting counts are high and the aquaculture industry not centralised. 
-Thus fabrication and falsification probably explain little of the observed patterns in the Norwegian lice count distribution.
+In a previous case [@NorgesHoeyesterett2015], a manager of a company was convicted of reporting that there were no lice when counts had not been carried out.
+The prevalence of fabrication and gross falsification is probably low as the penalties for misreporting counts are high.
+Thus fabrication and falsification probably explain little of the observed patterns in the Norwegian lice count distribution, but small-scale fabrication cannot be excluded, and might present as an excess of louse counts just below the limit. 
 
 ### Implications
 
-Suggests that facilities attempt to comply with the regulations by treating lice when the limit is exceeded rather than treating in anticipation to prevent the limit being exceeded.
+The Norwegian sea lice law [-@sealicelaw2012] § 8 states that "at any time there must be fewer than [0.2 or 0.5 depending on the season] adult female salmon lice on average per fish in the aquaculture facility".
+The apparently pervasive practice of recounting the lice after cleaning if an initial count is above the limit implies that Norwegian aquaculture facilities are routinely out of compliance with the law and the lice counts they submit misrepresent the true abundance of lice.
+The effect this reporting procedure on estimates of lice abundance can be demonstrated by taking some 2013 lice counts and reporting them as they would be in later years [@fig-2013plot].
+In this example, the true mean lice count over the year is `r tar_read(fig_2013_plot)$excess` % higher than reported by the simulation. 
+In sites that treat more often, the excess would be even higher.
 
-[use lice model to investigate difference in apparent infection pressure and true infection pressure with treat-then-report rather than report-then-treat]
+```{r}
+#| label: fig-2013plot
+#| fig-cap: Lice counts from one facility in 2013 (solid black line). Dashed line shows how the data would look if post-cleaning counts were reported (assuming 90% cleaning efficacy). Red area shows the unreported lice. The exact shape and size of this area depends on the rate of increase in lice and how soon the fish were cleaned. 
 
-Counts of salmon lice are currently the only metric used by the Norwegian Traffic Light System# to balance the growth of the aquaculture industry with the need to protect wild salmon populations.
+tar_read(fig_2013_plot)$plot
 
-If the count data do not reflect the true number of lice, estimates of lice infection pressure # will also be biased.
+```
 
-[expand]
+This under-reporting of lice is problematic because the self-reported lice counts are used by the regulators of the aquaculture industry. 
+In Norway, the Traffic Light System is a regulatory tool used since 2017 to balance the growth of the aquaculture industry with the need to protect wild salmon populations #.
+The Norwegian coast is divided into 13 production areas.
+Within each production area, the increased mortality of wild salmon due to lice is estimated by an Expert Group based on observational data and models. 
+If the estimated mortality is low, salmon production is allowed to increase, conversely if the estimated mortality is high, production must be decreased.
 
-Are facilites that count then treat if above limit in compliance with the law?
+Modelled lice infestation pressure is a key input to the Expert Group.
+The three models of lice infestation pressure used by the Expert Group all depend on the reported number of lice per fish.
+If the count data do not reflect the true number of lice, estimates of lice infection pressure will be biased.
 
-Norwegian salmon louse counts from #barentswatch are widely used.  Who uses barrentswatch data... check citations. classify into groups
 
-lice infestion pressure, lice-induced mortality of wild salmon
+Van Nes et al [-@Nes2024] presents a critical review of the traffic light system, arguing that several aspect of current practice have large uncertainties or overestimate the effect of lice on wild salmon including estimates of farm origin lice infestation pressure.
+Van Nes et al [-@Nes2024] argue that the low lice counts typically reported imply that only a small proportion of the female lice will be reproductively active. 
+This is density dependent effect, with low louse densities causing low encounter rates between adult male and female lice so not all females are fertilised [@Groner2014].
+As female salmon lice are monogamous [@Ritchie1996] and able to store sperm for several egg strings #, the probability that a louse is reproductively active will not depend on the current lice density, but on the highest density it experienced as an adult.
+Consequently, lice that survive delousing treatment will be more likely to be reproductively active than expected from their current density.
 
-Stige2022 drive their models lice-induced mortality of wild salmon with louse count data. 
 
 ### Recommendations
 
-The British Columbia lice counts does not show a discontinuity at the regulatory limit. 
-Aquaculture facilities in the province are regularly audited by the regulator #. 
+The British Columbia and Irish lice counts does not show a discontinuity at the regulatory limit. 
+In these jurisdictions, lice counts are either audited regularly or performed by the regulator.
+
+
 Godwin et al [-@Godwin2020] showed that lice counts are almost twenty percent higher in audits than in routine counts.
 
 - fix count sizes to prevent optional stopping
@@ -258,7 +297,7 @@ Godwin et al [-@Godwin2020] showed that lice counts are almost twenty percent hi
 
 ## Conclusions
 
-Counts of salmon lice from Norwegian aquaculture facilities do not fully reflect the true number of lice as two procedures are used to artificially deflate the counts when they are above the regulatory limit
+Counts of salmon lice from Norwegian aquaculture facilities do not fully reflect the true number of lice.
 
 ## Acknowledgements
 
@@ -266,30 +305,24 @@ So long, and thanks for all the fish.
 
 ## Data availability
 
-All data are publicly available from the regulars in Canada, Ireland, Norway, and Scotland. 
+All data are publicly available from the regulators in Canada, Ireland, Norway, and Scotland. 
 Code to reproduce this manuscript is available from  https://github.com/richardjtelford/lice-at-the-limit
 
 
 ## References
 
-https://www.domstol.no/globalassets/upload/hret/avgjorelser/2016/avgjorelser-desember-2016/sak-2016-1391.pdf
 
-https://www.domstol.no/globalassets/upload/hret/avgjorelser/2015/saknr-2014-1689.pdf
-
-
-A. Elmoslemany, S.K. Whyte, C.W. Revie, K.L. Hammell
-Sea lice monitoring on Atlantic salmon farms in New Brunswick, Canada: comparing audit and farm staff counts
-J. Fish Dis., 36 (2013), pp. 241-247
 
 ::: {#refs}
 :::
 
 
+---
 
-Skilbrei OT, Heino M, Svåsand T. (2015) Using simulated escape events to assess the annual numbers and
-destinies of escaped farmed Atlantic salmon of different life stages, from farms sites in Norway. ICES Journal of
-Marine Science, 72 : 670–685.
-https://doi.org/10.1093/icesjms/fsu133
+A. Elmoslemany, S.K. Whyte, C.W. Revie, K.L. Hammell
+Sea lice monitoring on Atlantic salmon farms in New Brunswick, Canada: comparing audit and farm staff counts
+J. Fish Dis., 36 (2013), pp. 241-247
+
 
 
 Fate and effects of fish farm organic waste in marine systems: Advances in understanding using biochemical approaches with implications for environmental management
