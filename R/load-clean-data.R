@@ -28,7 +28,7 @@ load_britishcolumbia <- function(file){
 }
 
 # ireland
-load_ireland <- function(file){
+load_ireland <- function(file, ireland_2009){
   ### from pdfs
 
   pdfs <- tribble(~ file, ~ start, ~ end, ~ good,
@@ -60,24 +60,32 @@ load_ireland <- function(file){
     map("result") |>
     list_rbind() |>
     mutate(date = dmy(date),
-           gravid_lep = as.numeric(gravid_lep),
-           total_lep = as.numeric(total_lep),
-           year = year(date)) |>
+           across(-date, as.numeric)
+           ) |>
     rename(lice = gravid_lep, total_lice = total_lep) |>
-    filter(year(date) > 2007) |> # different rules before 2008
-    mutate(date2 = set_year(date, 2020),
-           limit = if_else(between(date2, ymd("2020-3-1"), ymd("2020-5-31")), 0.5, 2)) |>
-    select(-date2)
+    filter(year(date) > 2007) # different rules before 2008
 
-  combined_pdf
+
+  ## import 2009 data (corrupted pdf - cannot import with the others)
+ireland_2009_data <- read_delim(ireland_2009) |>
+  mutate(date = dmy(date)) |>
+  rename(lice = gravid_female, total_lice = total)
+
+  bind_rows(combined_pdf, ireland_2009_data) |>
+    mutate(
+      year = year(date),
+      date2 = set_year(date, 2020),
+      limit = if_else(between(date2, ymd("2020-3-1"), ymd("2020-5-31")), 0.5, 2)
+    ) |>
+    select(-date2)
 }
 
 # load all data
-load_all_data <- function(norway, scotland, britishColumbia, ireland){
+load_all_data <- function(norway, scotland, britishColumbia, ireland, ireland_2009){
   norway <- load_norway(norway)
   scotland <- load_scotland(scotland)
   britishColumbia <- load_britishcolumbia(britishColumbia)
-  ireland <- load_ireland(ireland)
+  ireland <- load_ireland(ireland, ireland_2009)
 
   list(norway = norway, scotland = scotland, britishColumbia = britishColumbia, ireland = ireland)
 }

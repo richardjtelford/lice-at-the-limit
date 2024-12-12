@@ -4,6 +4,7 @@
 .Ruserdata
 
 data/
+!data/ireland/lice-extracted.csv
 
 *.pdf
 *.typ

@@ -42,11 +42,16 @@ list(
     command = file.path("data/ireland/pdf", list.files(here::here("data/ireland/pdf/"), pattern = "\\.pdf$", recursive = TRUE)),
     format = "file"
   ),
+  tar_target(
+    name = ireland_2009,
+    command = here("data/ireland/lice-extracted.csv"),
+    format = "file"
+  ),
 
   #### load data ####
   tar_target(
     name = all_data,
-    command = load_all_data(norway = norway_file, scotland = scotland_file, britishColumbia = britishColumbia_file, ireland = ireland_file)
+    command = load_all_data(norway = norway_file, scotland = scotland_file, britishColumbia = britishColumbia_file, ireland = ireland_file, ireland_2009 = ireland_2009)
   ),
 
   #### find periods ####
