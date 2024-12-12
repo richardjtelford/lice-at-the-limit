@@ -97,6 +97,16 @@ list(
     command = simulate_optimal_stopping()
   ),
 
+  #### more figures ####
+  tar_target(
+    name = fig_2013_plot,
+    command = make_2013_plot(all_data)
+  ),
+  tar_target(
+    name = fig_compliance_plot,
+    command = make_compliance_plot(all_data)
+  ),
+
   #### manuscript ####
   tar_quarto(
     name = manuscript,
