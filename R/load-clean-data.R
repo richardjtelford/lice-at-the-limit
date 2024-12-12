@@ -2,7 +2,7 @@
 load_norway <- function(file){
   norway <- readxl::read_excel(file) |>
     janitor::clean_names() |>
-    select(year = ar, lice = voksne_hunnlus, limit = lusegrense_uke) |>
+    select(year = ar, lice = voksne_hunnlus, limit = lusegrense_uke, week = uke, area = produksjonsomrade_id, site = lokalitetsnummer) |>
     drop_na(lice)
   norway
 }
