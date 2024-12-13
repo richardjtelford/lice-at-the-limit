@@ -27,25 +27,26 @@ make_compliance_plot <- function(all_data){
     Norway = all_data$norway |>
       filter(limit != "Ukjent") |>
       mutate(limit = as.numeric(limit)) |>
-      group_by(limit, year) |> summarise(below = mean(lice <= limit)) |>
+      group_by(limit, year) |>
+      summarise(below = mean(lice <= limit), .groups = "drop") |>
       mutate(limit = if_else(limit == 0.2, "Smolt migration", "Rest of year")),
 
     Scotland = all_data$scotland |>
       mutate(limit = 2) |>
       group_by(year, limit) |>
-      summarise(below = mean(lice <= limit)) |>
+      summarise(below = mean(lice <= limit), .groups = "drop") |>
       mutate(limit = "Rest of year"),
 
     `British Columbia` = all_data$britishColumbia |>
       mutate(limit = 3) |>
       group_by(year, limit) |>
 
-      summarise(below = mean(lice <= limit)) |>
+      summarise(below = mean(lice <= limit), .groups = "drop") |>
       mutate(limit = "Rest of year"),
 
     Ireland = all_data$ireland |>
       group_by(year, limit) |>
-      summarise(below = mean(lice <= limit))|>
+      summarise(below = mean(lice <= limit), .groups = "drop")|>
       mutate(limit = if_else(limit == 0.5, "Smolt migration", "Rest of year")),
 
     .id = "country"
