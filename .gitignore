@@ -3,7 +3,9 @@
 .RData
 .Ruserdata
 
-data/
+/data/*
+!/data/ireland/
+/data/ireland/*
 !data/ireland/lice-extracted.csv
 
 *.pdf
