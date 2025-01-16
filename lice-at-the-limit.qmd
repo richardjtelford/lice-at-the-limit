@@ -61,11 +61,11 @@ More onerous regulations further increase the cost of compliance and risk higher
 
 
 In common with many polluting industries, emissions from the aquaculture industry are regulated.
-Open net pen salmon farms release pharmaceutical products [@CasaResino2021], heavy metals [@Burridge2010], and organic waste # into the environment.
+Open net pen salmon farms release pharmaceutical products [@CasaResino2021], heavy metals [@Burridge2010], and organic waste [@Elvines2023] into the environment.
 In addition, farmed salmon host disease and parasites can be released into the environment and harm wild fish [@Krkosek2024].
 
 A parasite of particular concern is the salmon louse, _Lepeophtheirus salmonis_, an ectoparasitic copepod that infests salmonoid fish causing welfare issues and economic losses in the aquaculture industry [@Abolofia2017]. 
-Salmon lice released by the aquaculture industry are thought to be one of the drivers of decreasing wild salmon populations# alongside climate change xxx #.
+Salmon lice released by the aquaculture industry are thought to be one of the drivers of decreasing wild salmon populations [@Forseth2017] alongside escaped farmed salmon, acidification and hydropower regulation.
 Consequently, countries with salmon farming have established regulatory frameworks to control lice infestations [@Vormedal2023]. 
 The severity of the regulations, which focus on the mean number of adult lice per fish [@tbl-regulations], varies between countries, and has changed over time.
 
@@ -318,16 +318,10 @@ Code to reproduce this manuscript is available from  https://github.com/richardj
 
 
 ---
+possible citations
 
 A. Elmoslemany, S.K. Whyte, C.W. Revie, K.L. Hammell
 Sea lice monitoring on Atlantic salmon farms in New Brunswick, Canada: comparing audit and farm staff counts
 J. Fish Dis., 36 (2013), pp. 241-247
-
-
-
-Fate and effects of fish farm organic waste in marine systems: Advances in understanding using biochemical approaches with implications for environmental management
-Deanna M. Elvines, Catriona K. MacLeod, Donald. J. Ross, Grant A. Hopkins, Camille A. White
-First published: 05 April 2023
-https://doi.org/10.1111/raq.12821
 
 https://doi.org/10.3354/aei00443 Stige2022
