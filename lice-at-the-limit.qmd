@@ -61,7 +61,8 @@ More onerous regulations further increase the cost of compliance and risk higher
 
 
 In common with many polluting industries, emissions from the aquaculture industry are regulated.
-Open net pen salmon farms release pharmaceutical products [@CasaResino2021], heavy metals [@Burridge2010], and organic waste [@Elvines2023] into the environment.
+Open net pen salmon farms release pharmaceutical products [@CasaResino2021], heavy metals [@Burridge2010], and organic waste [@Elvines2023] into the environment, and escaped fish cause
+genetic pollution of wild stock [@Glover2017].
 In addition, farmed salmon host disease and parasites can be released into the environment and harm wild fish [@Krkosek2024].
 
 A parasite of particular concern is the salmon louse, _Lepeophtheirus salmonis_, an ectoparasitic copepod that infests salmonoid fish causing welfare issues and economic losses in the aquaculture industry [@Abolofia2017]. 
@@ -266,7 +267,7 @@ tar_read(fig_2013_plot)$plot
 ```
 
 This under-reporting of lice is problematic because the self-reported lice counts are used by the regulators of the aquaculture industry. 
-In Norway, the Traffic Light System is a regulatory tool used since 2017 to balance the growth of the aquaculture industry with the need to protect wild salmon populations #.
+In Norway, the Traffic Light System is a regulatory tool used since 2017 to balance the growth of the aquaculture industry with the need to protect wild salmon populations [@Hersoug2022].
 The Norwegian coast is divided into 13 production areas.
 Within each production area, the increased mortality of wild salmon due to lice is estimated by an Expert Group based on observational data and models. 
 If the estimated mortality is low, salmon production is allowed to increase, conversely if the estimated mortality is high, production must be decreased.
