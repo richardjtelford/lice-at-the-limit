@@ -1,7 +1,7 @@
-rdd_wrap <- function(.data, count_var, limit, xlim = c(0, 5), step = 0.01, xlabel = "Number of Adult Female Lice", ...) {
+rdd_wrap <- function(.data, count_var, limit, xlim = c(0, 5), step = 0.01, xlabel = "Number of Adult Female Lice", include_zero = FALSE, ...) {
   counts <- .data |>
     drop_na({{count_var}}) |>
-#    filter({{count_var}} > 0) |>
+    filter({{count_var}} > if_else(include_zero, -1, 0)) |>
     pull({{count_var}})
 
 
@@ -16,10 +16,12 @@ rdd_wrap <- function(.data, count_var, limit, xlim = c(0, 5), step = 0.01, xlabe
 }
 
 
-rdd_extract <- function(jump){
+rdd_extract <- function(rdd){
   tibble(
-    T = jump$test$t_jk,
-    p = jump$test$p_jk
+    T = rdd$jump$test$t_jk,
+    p = rdd$jump$test$p_jk,
+    before = rdd$plot$Estl$Estimate[nrow(rdd$plot$Estl$Estimate), "f_p"],
+    after = rdd$plot$Estr$Estimate[1, "f_p"]
   )
 
 }
