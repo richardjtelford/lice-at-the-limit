@@ -88,8 +88,8 @@ list(
   ),
 
   tar_target(
-    name = norway_t_plot,
-    command = plot_norway_t(t_stats)
+    name = norway_effect_plot,
+    command = plot_norway_effect(t_stats)
   ),
 
   #### simulations ####
