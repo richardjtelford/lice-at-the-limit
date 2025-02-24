@@ -58,7 +58,7 @@ make_compliance_plot <- function(all_data){
     facet_wrap(vars(country)) +
     scale_y_continuous(labels = scales::label_percent()) +
     scale_colour_brewer(palette = "Set1") +
-    labs(x = "Year", y = "Percent compliance", colour = "Season", shape = "Season", linetype = "Season") +
+    labs(x = "Year", y = "Percent of counts below regulatory limit", colour = "Season", shape = "Season", linetype = "Season") +
     theme(
       legend.position = "bottom"
     )
