@@ -6,8 +6,8 @@
 
 # select
 # - All localities
-# - years 2012 onwards (2024 to replicate exactly)
-# - Week 1 to present (43 to replicate exactly)
+# - years 2012 - 2024
+# - Week 1 - 52
 # - excel format
 # The download and put into the data/norway directory
 

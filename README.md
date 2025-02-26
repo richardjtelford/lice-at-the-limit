@@ -4,7 +4,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-This repository contains code to reproduce Telford et qui (2024) "Lice at the limits: impact of regulatory limits on salmon lice counts in aquaculture facilities". 
+This repository contains code to reproduce Telford (2024) "Lice at the limits: circumvention of regulatory limits on salmon lice counts in aquaculture facilities"
 
 To reproduce the manuscript, install R 4.4.2 and RStudio. Then clone the repo, and open the `lice-at-the-limit.Rproj` file using RStudio. This will open the project.
 
