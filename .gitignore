@@ -13,3 +13,5 @@
 *.html
 
 *_files/
+
+!docs/*.html
