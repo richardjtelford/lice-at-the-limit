@@ -7,7 +7,8 @@ load_norway <- function(file) {
       limit = lusegrense_uke, week = uke,
       area = produksjonsomrade_id, site = lokalitetsnummer
     ) |>
-    drop_na(lice)
+    drop_na(lice) |>
+    filter(year <= 2024)
   norway
 }
 
@@ -16,7 +17,8 @@ load_scotland <- function(file) {
   scotland <- read_delim(file) |>
     janitor::clean_names() |>
     select(year, lice = weekly_average_af) |>
-    drop_na(lice)
+    drop_na(lice) |>
+    filter(year <= 2024)
 
   scotland
 }
@@ -30,7 +32,8 @@ load_britishcolumbia <- function(file) {
       lice = average_l_salmonis_motiles_per_fish,
       adult_female = average_l_salmonis_females_per_fish
       ) |>
-    drop_na(lice)
+    drop_na(lice) |>
+    filter(year <= 2024)
 
   britishcolumbia
 }

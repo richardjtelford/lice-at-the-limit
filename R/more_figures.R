@@ -1,11 +1,12 @@
 make_2013_plot <- function(all_data) {
 
 norway_example <- all_data$norway |>
-    filter(site == 11738, year == 2013) |> # site chosen because it had data throughout year and some data > 0.5
+    filter(site == 13229, year == 2012) |> # site chosen because it had data throughout year and some data > 0.5 #11738 11486
   mutate(newlice = if_else(lice > 0.5, lice * 0.1, lice))
 
-excess <- norway_example |> summarise(lm = mean(lice), nlm = mean(newlice), rat = (lm - nlm)/nlm) |>
-  mutate(pc = round(rat * 100, 1))
+excess <- norway_example |>
+  summarise(lm = mean(lice), nlm = mean(newlice), rat = (lm - nlm)/nlm) |>
+  mutate(pc = round(rat * 100))
 
 
 plot <- norway_example |>
