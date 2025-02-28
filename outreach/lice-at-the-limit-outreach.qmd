@@ -1,0 +1,298 @@
+---
+title: "Rare mønster i lakeslus teller"
+author: Richard J Telford
+date: today
+lang: nb
+format: 
+  closeread-html
+execute:
+  echo: false
+---
+
+```{r}
+#| label: setup
+#| message: false
+# load packages
+# infrastructure packages
+library(tidyverse)
+library(targets)
+
+# plotting packages
+library(patchwork)
+
+# set defaults
+theme_set(theme_bw(base_size = 16))
+
+```
+
+
+```{r}
+# load targets data
+tar_load(all_data, store = here::here(tar_config_get("store")))
+```
+
+
+:::{.cr-section layout="overlay-center"}
+
+
+Disse er lakselus [^bilde]. De er skadedyr som lever på laksefisk, og spiser fiskens slime, hud og blod. Hvis det er mange lus, fisken kan dø. [@cr-map]{scale-by="0.7"}
+
+:::{#cr-map .scale-to-fill}
+![](figures/Salmonlouse.jpg)
+:::
+
+Den lillest er en ung lus. Det er vanskelig å se forskjellen mellom han hunnlus of hannlus når de er så små. [@cr-map]{pan-to="60%, 80%" scale-by="3"}
+
+Dette er en voksen hunnlus. Den er ca 1--2 cm leng.  [@cr-map]{pan-to="30%, -10%" scale-by="2.5"}
+
+Denne hunnlus har lange eggstrenger med flere hundre egg. Disse egg kan angripe villaks og øker dødeligheten. [@cr-map]{pan-to="0%,-60%" scale-by="1.5"}
+
+
+Hver uke, fiskeoppdretter langs hele Norsk kyste teller lakselus og rapporter inn antall. 
+Dataene er samlet inn av [Barentswatch](https://www.barentswatch.no/data/fishhealth/lice) og er tilgjengelig for alle å se.[@cr-map]{scale-by="0.8"}
+
+La oss la oss titte på dataene.[@cr-map]{scale-by="0.8"}
+:::
+
+
+
+:::{.cr-section layout="overlay-center"}
+
+:::{#cr-hist-norge .scale-to-fill}
+```{r}
+#| label: cr-hist-norge
+#| fig-height: 8
+#| fig-width: 12
+
+limits <- tibble(limit = c(0.2, 0.5)) 
+
+
+hist_norge <- all_data$norway |> 
+  filter(year == 2024) |> 
+  filter(lice > 0) |> 
+  ggplot(aes(x = lice)) +
+  geom_histogram(boundary = -.Machine$double.eps, binwidth = 0.05) +
+  coord_cartesian(xlim = c(0, 2), ylim = c(0, NA)) +
+  geom_vline(data = limits, aes(xintercept = limit), colour = "#99151c", linetype = "dashed") +
+  facet_wrap(vars(as.character(limit)), labeller = as_labeller(c("0.2" = "Smoltvandring", "0.5" = "Uten smoltvandring"))) +
+  labs(x = "Antall voksne hunnlus per fisk [hvor antall lus > 0]", y = "Antall observasjoner", title = "Antal lakselus i Norge 2024") 
+
+hist_norge
+```
+:::
+Dette er dataene for 2024. I smoltvandringen,  til en hver tid være færre enn 0,2 voksen hunnlus av lakselus i gjennomsnitt per fisk i akvakulturanlegget. 
+Uten smoltvandering er lusegrensen 0,5 lus per fisk. [@cr-hist-norge]
+
+Det er store klipper i antall observasjoner ved lusegrensen i både smoltvandring og uten smoltvandring. Hva skjer her?[@cr-hist-norge]
+
+:::
+
+
+
+
+
+
+:::{.cr-section layout="overlay-center"}
+
+:::{#cr-hist-verden .scale-to-fill}
+```{r}
+#| label: cr-hist-verden
+#| fig-height: 8
+#| fig-width: 12
+
+nor2012 <- all_data$norway |> 
+  filter(year == 2012) |> 
+  filter(lice > 0) |> 
+  ggplot(aes(x = lice)) +
+  geom_histogram(boundary = -.Machine$double.eps, binwidth = 0.05) +
+  geom_vline(xintercept = 0.5, colour = "#99151c", linetype = "dashed") +
+  coord_cartesian(xlim = c(0, 3)) +
+  labs(x = "Antall voksne hunnlus per fisk [hvor antall > 0]", y = "Antall observasjoner", title = "Norge 2012")
+
+
+ire <- all_data$ireland |> 
+  filter(lice > 0) |> 
+  ggplot(aes(x = lice)) +
+  geom_histogram(boundary = -.Machine$double.eps, binwidth = 0.05) +
+  geom_vline(xintercept = 0.5, colour = "#99151c", linetype = "dashed") +
+  coord_cartesian(xlim = c(0, 3)) +
+  labs(x = "Antall hunnlus med eggstrenger per fisk [hvor antall > 0]", y = "Antall observasjoner", title = "Irland 2008-2023")
+
+sco <- all_data$scotland |> 
+  filter(lice > 0) |> 
+  ggplot(aes(x = lice)) +
+  geom_histogram(boundary = -.Machine$double.eps, binwidth = 0.05) +
+  geom_vline(xintercept = 2, colour = "#99151c", linetype = "dashed") +
+  coord_cartesian(xlim = c(0, 3)) +
+  labs(x = "Antall voksne hunnlus per fisk [hvor antall > 0]", y = "Antall observasjoner", title = "Skottland 2021-2023")
+
+bc <- all_data$britishColumbia |> 
+  filter(lice > 0) |> 
+  ggplot(aes(x = lice)) +
+  geom_histogram(boundary = -.Machine$double.eps, binwidth = 0.05) +
+  geom_vline(xintercept = 2, colour = "#99151c", linetype = "dashed") +
+  coord_cartesian(xlim = c(0, 4)) +
+  labs(x = "Antall voksne og ung lus per fisk [hvor antall > 0]", y = "Antall observasjoner", title = "British Columbia 2011-2024")
+
+
+ire + sco + bc + nor2012 + plot_layout(ncol = 2) +
+  plot_annotation(title = "Antall lakselus per fisk i forskjellige land")
+  
+```
+:::
+
+Hva skjedde også i andre land med lakseoppdrett? [@cr-hist-verden]
+
+Her er en histogramer av antall voksen hunnlus per fisk i tre land og Norge i 2012. Det er ingen klipper her. Norge er kun land med klippe i antall lus, og klippe begynner etter 2012. Hvorfor? [@cr-hist-verden]
+
+:::
+
+:::{.cr-section layout="overlay-center"}
+
+:::{focus-on="cr-lov2009"}
+Hva endret seg i 2013?
+:::
+
+Luseforskriften ble endret i 2013.[@cr-lov2009]
+
+Før 2013, må fiskeoppdretter behandle lus hvis det er mer lus enn lusegrensen.[@cr-lov2009]
+
+:::{#cr-lov2009 .scale-to-fill}
+# § 5.Tiltaksgrenser og tidsfrist for avlusing [^lov2009]
+
+| Behandling mot lakselus skal gjennomføres i hele akvakulturanlegget dersom det
+| i perioden 1. januar til 31. august påvises i gjennomsnitt mer enn 0,5 voksen
+| hunnlus av lakselus eller flere enn tre lakselus av bevegelige stadier i
+| gjennomsnitt pr. fisk.
+
+:::
+:::
+
+:::{.cr-section layout="overlay-center"}
+
+
+I 2013 og senere, må fiskeoppdretter holde altid lus under lusegrensen.  [@cr-lov2012]{hlz="cr-tilenhver"}
+
+
+
+:::{#cr-lov2012 .scale-to-fill}
+# § 8.Grenser for lakselus og tiltak [^lov2012]
+
+| I Nord-Trøndelag og sørover skal det fra og med mandag i uke 16 til og med søndag
+| i uke 21 [til en hver tid være færre]{#cr-tilenhver} enn 0,2 voksen hunnlus av lakselus i
+| gjennomsnitt per fisk i akvakulturanlegget.
+| Fra og med mandag i uke 22 til og med søndag i uke 15 skal det til en hver tid
+| være færre enn 0,5 voksen hunnlus av lakselus i gjennomsnitt per fisk i akvakulturanlegget.
+
+
+:::
+
+Bakgrunnen for endringen var å gjøre oppdrettere mer proaktive og behandle lus før de overskred grensen. [@cr-lov2012]
+
+
+:::
+
+:::{.cr-section layout="overlay-center"}
+
+:::{#cr-hist-norge2 .scale-to-fill}
+```{r}
+#| label: cr-hist-norge2
+#| fig-height: 8
+#| fig-width: 12
+
+
+norge_grense <- all_data$norway |> 
+  filter(year == 2024, limit == 0.5) |> 
+  filter(lice >= 0.49 & lice < 0.51) |>
+  mutate(lice = floor(lice * 100)) |> 
+  count(lice)
+
+hist_norge <- all_data$norway |> 
+  filter(year == 2024) |> 
+  filter(lice > 0) |> 
+  ggplot(aes(x = lice)) +
+  geom_histogram(boundary = -.Machine$double.eps, binwidth = 0.01) +
+  coord_cartesian(xlim = c(0, 0.75), ylim = c(0, NA)) +
+  geom_vline(data = limits, aes(xintercept = limit), colour = "#99151c", linetype = "dashed") +
+  facet_wrap(vars(as.character(limit)), labeller = as_labeller(c("0.2" = "Smoltvandring", "0.5" = "Uten smoltvandring")), scale = "free_y") +
+  labs(x = "Antall voksne hunnlus per fisk [hvor antall lus > 0]", y = "Antall observasjoner", title = "Antal lakselus i Norge 2024 uten smoltvandring") 
+
+hist_norge
+```
+:::
+
+Forskere[^Saevik] har foreslått klippen i antall lus utviklet fordi norsk fiskeoppdretter ble mer effektiv i behandling av lus. [@cr-hist-norge2]
+
+Det er matematisk umulig å gi så sterk klippe sånn. I 2024, har `r norge_grense$n[1]` observasjoner fra 0,49 til 0,5 lus per fisk, men kun `r norge_grense$n[2]` observasjoner fra 0,5 til 0,51 lus per fisk. 
+Usikkerhet i tellingene gir en mer gradvis endring. [@cr-hist-norge2] 
+
+Den andre muligheten er at fiskeoppdretter omgår reglene. 
+Hvis fiskeoppdretter teller mer enn 0,5 lus per fisk, de kunne behandle lusene, og telle igjen. 
+Den nye tellingen skal være under grensen. 
+Hvis fiskeoppdretter rapporterer den andre tellingen, ser de ut til å være medgjørlig med forskifter. [@cr-hist-norge2]
+:::
+
+
+:::{.cr-section layout="overlay-center"}
+
+:::{#cr-2012 .scale-to-fill}
+```{r}
+#| label: cr-2012
+#| fig-height: 8
+#| fig-width: 12
+
+
+
+norway_example <- all_data$norway |>
+    filter(site == 13229, year == 2012) |> # site chosen because it had data throughout year and some data > 0.5 #11738 11486
+  mutate(newlice = if_else(lice > 0.5, lice * 0.1, lice))
+
+excess <- norway_example |>
+  summarise(lm = mean(lice), nlm = mean(newlice), rat = (lm - nlm)/nlm) |>
+  mutate(pc = round(rat * 100, 1))
+
+
+plot <- norway_example |>
+  ggplot(aes(x = week, y = lice)) +
+  geom_area(fill = "grey") +
+  geom_line() +
+  labs(x = "Uke", y = "Antall lus") +
+  coord_cartesian(ylim = c(0, max(norway_example$lice)))
+
+plot 
+
+```
+:::
+Spiller det noen rolle om fiskeoppdretter rapporterer tellinger etter behandling?  [@cr-2012]
+
+Her er ekte dataen fra en fiskoppdrett fra 2012. [@cr-2012]
+
+:::{#cr-2012b .scale-to-fill}
+```{r}
+#| label: cr-2012b
+#| fig-height: 8
+#| fig-width: 12
+
+plot + aes(y = newlice) +
+  labs(x = "Uke", y = "Antall lus") 
+
+```
+:::
+
+Og her er sammen dataen om vi simulare at fiskeoppdretter rapporterer tellinger etter behandling. [@cr-2012b]
+
+Ekte tellingen viser fire ganger mer lus i gjennomsnitt. [@cr-2012b]
+
+Hvis vi kan ikke stole på dataene, hva kan vi bruke dem for? [@cr-2012b]
+
+:::
+
+
+
+
+
+
+[^bilde]: Bilde av Thomas Bjørkan [Wikipedia](https://commons.wikimedia.org/wiki/File:Salmonlouse.jpg)
+[^lov2009]: [FOR-2009-08-18-1095](https://lovdata.no/dokument/SFO/forskrift/2009-08-18-1095)
+[^lov2012]: [FOR-2012-12-05-1140](https://lovdata.no/dokument/SF/forskrift/2012-12-05-1140)
+[^Saevik]: [DOI: 10.1016/j.aquaculture.2023.739886](https://doi.org/10.1016/j.aquaculture.2023.739886)
