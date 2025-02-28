@@ -15,7 +15,7 @@ format:
   pdf:
     papersize: a4
   html: 
-    self-contained: true
+    self-contained: false
 editor: visual
 abstract: >
   Salmon lice cause welfare issues to farmed salmonoids, economic losses to the aquaculture industry, and are one of the most serious threats to wild salmon populations.
