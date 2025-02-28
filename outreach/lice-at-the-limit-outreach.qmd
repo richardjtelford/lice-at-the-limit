@@ -48,7 +48,7 @@ Dette er en voksen hunnlus. Den er ca 1--2 cm leng.  [@cr-map]{pan-to="30%, -10%
 Denne hunnlus har lange eggstrenger med flere hundre egg. Disse egg kan angripe villaks og øker dødeligheten. [@cr-map]{pan-to="0%,-60%" scale-by="1.5"}
 
 
-Hver uke, fiskeoppdretter langs hele Norsk kyste teller lakselus og rapporter inn antall. 
+Hver uke, oppdrettsanlegg langs hele Norsk kyste teller lakselus og rapporter inn antall. 
 Dataene er samlet inn av [Barentswatch](https://www.barentswatch.no/data/fishhealth/lice) og er tilgjengelig for alle å se.[@cr-map]{scale-by="0.8"}
 
 La oss la oss titte på dataene.[@cr-map]{scale-by="0.8"}
@@ -155,7 +155,7 @@ Hva endret seg i 2013?
 
 Luseforskriften ble endret i 2013.[@cr-lov2009]
 
-Før 2013, må fiskeoppdretter behandle lus hvis det er mer lus enn lusegrensen.[@cr-lov2009]
+Før 2013, må oppdrettsanlegg behandle lus hvis det er mer lus enn lusegrensen.[@cr-lov2009]
 
 :::{#cr-lov2009 .scale-to-fill}
 # § 5.Tiltaksgrenser og tidsfrist for avlusing [^lov2009]
@@ -171,7 +171,7 @@ Før 2013, må fiskeoppdretter behandle lus hvis det er mer lus enn lusegrensen.
 :::{.cr-section layout="overlay-center"}
 
 
-I 2013 og senere, må fiskeoppdretter holde altid lus under lusegrensen.  [@cr-lov2012]{hlz="cr-tilenhver"}
+I 2013 og senere, må oppdrettsanlegg holde altid lus under lusegrensen.  [@cr-lov2012]{hlz="cr-tilenhver"}
 
 
 
@@ -221,15 +221,15 @@ hist_norge
 ```
 :::
 
-Forskere[^Saevik] har foreslått klippen i antall lus utviklet fordi norsk fiskeoppdretter ble mer effektiv i behandling av lus. [@cr-hist-norge2]
+Forskere[^Saevik] har foreslått klippen i antall lus utviklet fordi norsk oppdrettsanlegg ble mer effektiv i behandling av lus. [@cr-hist-norge2]
 
 Det er matematisk umulig å gi så sterk klippe sånn. I 2024, har `r norge_grense$n[1]` observasjoner fra 0,49 til 0,5 lus per fisk, men kun `r norge_grense$n[2]` observasjoner fra 0,5 til 0,51 lus per fisk. 
 Usikkerhet i tellingene gir en mer gradvis endring. [@cr-hist-norge2] 
 
-Den andre muligheten er at fiskeoppdretter omgår reglene. 
-Hvis fiskeoppdretter teller mer enn 0,5 lus per fisk, de kunne behandle lusene, og telle igjen. 
+Den andre muligheten er at oppdrettsanlegg omgår reglene. 
+Hvis oppdrettsanlegg teller mer enn 0,5 lus per fisk, de kunne behandle lusene, og telle igjen. 
 Den nye tellingen skal være under grensen. 
-Hvis fiskeoppdretter rapporterer den andre tellingen, ser de ut til å være medgjørlig med forskifter. [@cr-hist-norge2]
+Hvis oppdrettsanlegg rapporterer den andre tellingen, ser de ut til å være medgjørlig med forskifter. [@cr-hist-norge2]
 :::
 
 
@@ -263,9 +263,9 @@ plot
 
 ```
 :::
-Spiller det noen rolle om fiskeoppdretter rapporterer tellinger etter behandling?  [@cr-2012]
+Spiller det noen rolle om oppdrettsanlegg rapporterer tellinger etter behandling?  [@cr-2012]
 
-Her er ekte dataen fra en fiskoppdrett fra 2012. [@cr-2012]
+Her er ekte dataen fra en oppdrettsanlegg fra 2012. [@cr-2012]
 
 :::{#cr-2012b .scale-to-fill}
 ```{r}
@@ -279,7 +279,7 @@ plot + aes(y = newlice) +
 ```
 :::
 
-Og her er sammen dataen om vi simulare at fiskeoppdretter rapporterer tellinger etter behandling. [@cr-2012b]
+Og her er sammen dataen om vi simulare at oppdrettsanlegg rapporterer tellinger etter behandling. [@cr-2012b]
 
 Ekte tellingen viser fire ganger mer lus i gjennomsnitt. [@cr-2012b]
 

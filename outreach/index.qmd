@@ -1,0 +1,70 @@
+---
+title: "Lice at the limit"
+subtitle: Explaining unexpected patterns in salmon lice counts
+author: Richard J Telford
+date: today
+format: 
+  html
+execute:
+  echo: false
+---
+
+
+```{r}
+#| label: setup
+#| message: false
+# load packages
+# infrastructure packages
+library(tidyverse)
+library(targets)
+
+# plotting packages
+library(patchwork)
+
+# set defaults
+theme_set(theme_bw(base_size = 14))
+
+```
+
+
+```{r}
+# load targets data
+tar_load(all_data, store = here::here(tar_config_get("store")))
+```
+
+
+Salmon lice are parasites that harm farmed fish and are one of the most serious threats to wild salmon. 
+Regulations limit the number of lice per fish to minimise these harms.
+Lice are counted regularly to help plan treatments and check complience with the regulations.
+In Norway, but not other countries, the louse counts show an unexpected cliff at the regulatory limit.
+
+```{r}
+#| label: cr-hist-norge
+#| fig-height: 4
+#| fig-width: 6
+
+limits <- tibble(limit = c(0.2, 0.5)) 
+
+
+hist_norge <- all_data$norway |> 
+  filter(year == 2024) |> 
+  filter(lice > 0) |> 
+  ggplot(aes(x = lice)) +
+  geom_histogram(boundary = -.Machine$double.eps, binwidth = 0.05) +
+  coord_cartesian(xlim = c(0, 2), ylim = c(0, NA)) +
+  geom_vline(data = limits, aes(xintercept = limit), colour = "#99151c", linetype = "dashed") +
+  facet_wrap(vars(as.character(limit)), labeller = as_labeller(c("0.2" = "Smoltvandring", "0.5" = "Uten smoltvandring"))) +
+  labs(x = "Antall voksne hunnlus per fisk [hvor antall lus > 0]", y = "Antall observasjoner", title = "Antal lakselus i Norge 2024") 
+
+hist_norge
+```
+
+
+This work explores the potential causes of this cliff, and concludes that the cliff started to develop in 2013 after the regulations changed as fish farmers attempted to circumvent the new regulations.
+
+- [Les sammendrag på norsk](lice-at-the-limit-outreach.html)
+- Read the [pre-print](lice-at-the-limit.html).
+
+The manuscript is reproducible. Code is available on [GitHub](https://github.com/richardjtelford/lice-at-the-limit/), data are available from the regulators.
+
+
