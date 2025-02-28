@@ -1,6 +1,6 @@
 project:
   output-dir: ../docs
   render:
-    - bio300b_logistics.qmd
-    - lecture_1_data_lifecycle.qmd
+    - index.qmd
+    - lice-at-the-limit-outreach.qmd
 
