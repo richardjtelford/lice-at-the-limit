@@ -3,8 +3,11 @@ title: "Rare mønster i lakeslus teller"
 author: Richard J Telford
 date: today
 lang: nb
-format: 
-  closeread-html
+format:
+  closeread-html:
+    cr-style:
+      narrative-background-color-overlay: "#ebebeb"
+      narrative-text-color-overlay: "#050505"
 execute:
   echo: false
 ---
