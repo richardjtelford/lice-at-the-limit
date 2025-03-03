@@ -259,7 +259,7 @@ plot <- norway_example |>
   ggplot(aes(x = week, y = lice)) +
   geom_area(fill = "grey") +
   geom_line() +
-  labs(x = "Uke", y = "Antall lus") +
+  labs(x = "Uke", y = "Antall lus per fisk", title = "Antall lus fra en oppdrettsanlegg i 2012") +
   coord_cartesian(ylim = c(0, max(norway_example$lice)))
 
 plot 
@@ -277,7 +277,7 @@ Her er ekte dataen fra en oppdrettsanlegg fra 2012. [@cr-2012]
 #| fig-width: 12
 
 plot + aes(y = newlice) +
-  labs(x = "Uke", y = "Antall lus") 
+  labs(x = "Uke", y = "Antall lus per fisk", title = "Antall lus fra en oppdrettsanlegg i 2012 etter simulert behandling")
 
 ```
 :::
