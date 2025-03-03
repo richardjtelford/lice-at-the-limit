@@ -62,8 +62,9 @@ hist_norge
 
 This work explores the potential causes of this cliff, and concludes that the cliff started to develop in 2013 after the regulations changed as fish farmers attempted to circumvent the new regulations.
 
-- [Les sammendrag på norsk](lice-at-the-limit-outreach.html)
+- [Les sammendrag på norsk](lice-at-the-limit-outreach.html).
 - Read the [pre-print](lice-at-the-limit.html).
+- [Explore]( https://richardjtelford.shinyapps.io/lice_at_the_limit/) the Norwegian louse count data by production area and year.
 
 The manuscript is reproducible. Code is available on [GitHub](https://github.com/richardjtelford/lice-at-the-limit/), data are available from the regulators.
 
