@@ -13,7 +13,6 @@ conflict_prefer_all("dplyr", quiet = TRUE)
 # Set target options:
 tar_option_set(
   packages = c("tidyverse", "here", "glue", "rddensity", "patchwork") # Packages that your targets need for their tasks.
-
 )
 
 # Run the R scripts in the R/ folder with your custom functions:
@@ -34,12 +33,21 @@ list(
   ),
   tar_target(
     name = britishColumbia_file,
-    command = here("data/british-columbia/lice-count-dens-pou-2011-ongoing-rpt-pac-dfo-mpo-aquaculture-eng.csv"),
+    command = here(
+      "data/british-columbia/lice-count-dens-pou-2011-ongoing-rpt-pac-dfo-mpo-aquaculture-eng.csv"
+    ),
     format = "file"
   ),
   tar_target(
     name = ireland_file,
-    command = file.path("data/ireland/pdf", list.files(here::here("data/ireland/pdf/"), pattern = "\\.pdf$", recursive = TRUE)),
+    command = file.path(
+      "data/ireland/pdf",
+      list.files(
+        here::here("data/ireland/pdf/"),
+        pattern = "\\.pdf$",
+        recursive = TRUE
+      )
+    ),
     format = "file"
   ),
   tar_target(
@@ -47,11 +55,29 @@ list(
     command = here("data/ireland/lice-extracted.csv"),
     format = "file"
   ),
+  tar_target(
+    name = iceland,
+    command = command = file.path(
+      "data/iceland/pdf",
+      list.files(
+        here::here("data/iceland/pdf/"),
+        pattern = "\\.pdf$",
+        recursive = TRUE
+      )
+    ),
+    format = "file"
+  ),
 
   #### load data ####
   tar_target(
     name = all_data,
-    command = load_all_data(norway = norway_file, scotland = scotland_file, britishColumbia = britishColumbia_file, ireland = ireland_file, ireland_2009 = ireland_2009)
+    command = load_all_data(
+      norway = norway_file,
+      scotland = scotland_file,
+      britishColumbia = britishColumbia_file,
+      ireland = ireland_file,
+      ireland_2009 = ireland_2009
+    )
   ),
 
   #### find periods ####
@@ -118,5 +144,4 @@ list(
     path = "lice-at-the-limit.qmd",
     extra_files = "lice.bib"
   )
-
 )
