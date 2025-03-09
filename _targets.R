@@ -56,8 +56,8 @@ list(
     format = "file"
   ),
   tar_target(
-    name = iceland,
-    command = command = file.path(
+    name = iceland_file,
+    command = file.path(
       "data/iceland/pdf",
       list.files(
         here::here("data/iceland/pdf/"),
@@ -76,7 +76,8 @@ list(
       scotland = scotland_file,
       britishColumbia = britishColumbia_file,
       ireland = ireland_file,
-      ireland_2009 = ireland_2009
+      ireland_2009 = ireland_2009,
+      iceland = iceland_file
     )
   ),
 

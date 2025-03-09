@@ -147,24 +147,39 @@ load_ireland <- function(file, ireland_2009) {
     select(-date2, -total_cal, -gravid_cal)
 }
 
+## iceland
+
+load_iceland <- function(files) {
+  iceland <- files |>
+    set_names(basename(files)) |>
+    map(extract_iceland) |>
+    list_rbind(names_to = "site")
+
+  iceland
+}
+
+
 # load all data
 load_all_data <- function(
   norway,
   scotland,
   britishColumbia,
   ireland,
-  ireland_2009
+  ireland_2009,
+  iceland
 ) {
   norway <- load_norway(norway)
   scotland <- load_scotland(scotland)
   britishColumbia <- load_britishcolumbia(britishColumbia)
   ireland <- load_ireland(ireland, ireland_2009)
+  iceland <- load_iceland(iceland)
 
   list(
     norway = norway,
     scotland = scotland,
     britishColumbia = britishColumbia,
-    ireland = ireland
+    ireland = ireland,
+    iceland = iceland
   )
 }
 
