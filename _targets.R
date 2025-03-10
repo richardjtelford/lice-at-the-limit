@@ -144,5 +144,10 @@ list(
     name = manuscript,
     path = "lice-at-the-limit.qmd",
     extra_files = "lice.bib"
+  ),
+  #### supplementary material ####
+  tar_quarto(
+    name = supplementary,
+    path = "supplementary_information.qmd"
   )
 )

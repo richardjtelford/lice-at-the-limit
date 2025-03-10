@@ -1,0 +1,113 @@
+---
+title: "Supplementary material for lice at the limits: circumvention of regulatory limits on salmon lice counts in aquaculture facilities"
+author:
+  - name: Richard J Telford
+    orcid: 0000-0001-9826-3076
+    email: richard.telford@uib.no
+    affiliations:
+      - name: Department of Biological Sciences, University of Bergen 
+        city: Bergen
+        address: Postbox 7803
+        country: Norway
+        postal-code: N-5020
+  - name: et qui?
+format: 
+  pdf:
+    papersize: a4
+  html: 
+    self-contained: false
+editor: visual
+execute:
+  echo: false
+  error: true
+---
+
+
+Histograms showing the distribution of the mean number of lice per fish in Iceland (@fig-iceland), Ireland (@fig-ireland), and Norway (@fig-norway1, @fig-norway2) when the lice count is greater than zero.
+All histograms are truncated at three lice per fish to better show the distribution of lice counts near the regulatory limit.
+The vertical dashed line shows the regulatory limit on the number of lice per fish. 
+In Norway from 2017, the limit in reduced in the smolt migration season.
+
+
+```{r}
+#| label: setup
+#| message: false
+
+# packages used in the document
+library(targets)
+library(tidyverse)
+
+
+# set default ggplot theme
+theme_set(theme_bw())
+
+# load data
+tar_load(all_data)
+```
+
+```{r}
+#| label: hist-function
+
+plot_hist <- function(data, x, xlab = "Mean number of adult female lice per fish", xlim = c(0, 3), binwidth = 0.05, vline = NULL, facet = "none") {
+  p <- data |> 
+    filter(lice > 0) |> 
+    ggplot(aes(x = lice)) +
+    geom_histogram(boundary = -.Machine$double.eps, binwidth = binwidth) +
+    coord_cartesian(xlim = xlim) +
+    labs(x = xlab, y = "Number of surveys")
+  
+  if (!is.null(vline)) {
+    p <- p + 
+      geom_vline(data = vline, aes(xintercept = lice), linetype = "dashed", colour = "#99151c")
+  }
+  
+  if (facet == "year") {
+    p <- p + facet_wrap(vars(year), ncol = 2)
+  } else if (facet == "seasonyear") {
+    p <- p + facet_grid(rows = vars(year), cols = vars(limit))
+  }
+  
+  p
+}
+```
+
+
+```{r}
+#| label: fig-iceland
+#| fig-cap: Iceland
+
+all_data$iceland |> plot_hist(vline = tibble(lice = 0.5))
+
+```
+
+```{r}
+#| label: fig-ireland
+#| fig-cap: in Ireland
+
+all_data$ireland |> 
+  plot_hist(vline = tibble(lice = 0.5), xlab = "Mean number of egg-bearing lice per fish")
+
+```
+
+```{r}
+#| label: fig-norway1
+#| fig-cap: Norway 2012 -- 2016
+#| fig-height: 8 
+
+
+all_data$norway |> 
+  filter(year < 2017) |> 
+  plot_hist(vline = tibble(lice = 0.5), facet = "year")
+```
+
+
+```{r}
+#| label: fig-norway2
+#| fig-cap: Norway since 2017
+#| fig-height: 12
+
+all_data$norway |> 
+  filter(!limit == "Ukjent") |> 
+  filter(year >= 2017) |> 
+  plot_hist(vline = tibble(lice = c(0.2, 0.5), limit = c("0.2", "0.5")), facet = "seasonyear")
+```
