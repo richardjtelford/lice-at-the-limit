@@ -10,11 +10,10 @@ author:
         address: Postbox 7803
         country: Norway
         postal-code: N-5020
-  - name: et qui?
-format: 
-  pdf:
+format:
+  aft-pdf:
     papersize: a4
-    keep-tex: true 
+    keep-tex: true  
   html: 
     self-contained: false
 editor: visual
@@ -82,8 +81,8 @@ The severity of the regulations, which focus on the mean number of adult lice pe
 #| tbl-cap: "Regulatory limits on the number of adult lice per fish in different countries."
 tibble::tribble(
   ~Country, ~Period, ~"Limit per fish", ~"Self-reported",
-  "British Columbia, Canada", "2003", "3 motile lice", "Yes, with audits",
-  "Iceland", "", "", ""
+  "British Columbia, Canada", "2003-", "3 motile lice", "Yes, with audits",
+  "Iceland", "2014-", "0.5 adult female lice", "",
   "Ireland", "2008-", "0.5 egg-bearing lice during the smolt out-migration, 2 otherwise", "No",
   "Norway", "2009-2012", "1 adult female lice, or 5 motile lice", "Yes",
   "Norway", "2013-2016", "0.5 adult female lice", "Yes",
@@ -95,6 +94,9 @@ tibble::tribble(
   tab_footnote(
     footnote = paste0("Equivalent to 0.64--1.65 adult females per fish ", cite("Vormedal2023", bib), "."),
     locations = cells_body(columns = `Limit per fish`, rows = 1)
+  ) |> 
+    opt_table_font(
+      size = "12px"
   )
 
 ```
@@ -124,7 +126,7 @@ tar_load(periods)
 
 We examine the distribution of the mean louse counts reported by the aquaculture facilities to the national regulators using publicly available data.
 Lice count data were downloaded from the regulators in British Columbia (`r periods$britishColumbia`) [@FOC2024], Ireland (`r periods$ireland`) [@MarineInstitute20082024], Norway (`r periods$norway`) [@Barentswatch2024], and Scotland (`r periods$scotland`) [@SEPA2024].
-Lice count data from Iceland (2016--2024) were available from one of the operators [@arnarlax2025].
+Lice count data from Iceland (2016--2024) were available from one of the operators [@arnarlax2024].
 
 We test for discontinuities at the regulatory limits using the `r pkrt("rddensity")`.
 All analyses were done in `r pkrt("R")`. 
@@ -155,7 +157,7 @@ The Scottish record is too short to meaningfully address trends.
 tar_read(lice_hist)
 ```
 
-With the exception of Norwegian data after 2012, histograms of louse counts show a gradual monotonic decline with heavy-tails (@fig-hist, Supplementary material figures 1--4).
+With the exception of Norwegian data after 2012, histograms of louse counts show a gradual monotonic decline with heavy-tails (@fig-hist, Supplementary material figures S1--S5).
 The spikes in the data either reflect rounding or many counts being based on the same number of fish.
 They do not affect the interpretation.
 Norwegian louse counts post-2017 show a different pattern, with a sharp drop to near zero counts at the regulatory limit.
@@ -324,11 +326,12 @@ In practice, if the trigger for treatment was strictly enforced, the situation w
 
 ## Acknowledgements
 
-So long, and thanks for all the fish.
+Discussions with Mari Lie Larsen and Ingeborg Kahrs helped formulate the argument in this paper. 
+Cathy Jenks edited the language.
 
 ## Data availability
 
-All data are publicly available from the regulators in Canada, Ireland, Norway, and Scotland, or an operator in Iceland.
+All data are publicly available from the regulators in Canada, Ireland, Norway, and Scotland, or an aquaculture facility operator in Iceland.
 Code to reproduce this manuscript is available from  https://github.com/richardjtelford/lice-at-the-limit
 
 

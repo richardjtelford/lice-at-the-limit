@@ -11,6 +11,8 @@
 *.pdf
 *.typ
 *.html
+*.tex
+*.log
 
 *_files/
 
@@ -18,4 +20,4 @@
 !docs/*_files/
 !docs/*.pdf
 
-
+todo.R
