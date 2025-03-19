@@ -22,3 +22,10 @@ It will
  The Norwegian data need downloading manually - there is an API but registration as complex as simply downloading the data.
 
 The pipeline that processes all the data and produces the manuscript is managed by the `targets` package. File `0-make.R` will initiate the process.
+
+## Licence
+
+Code is licensed under the MIT license. 
+The manuscript and other text is licensed under the Creative Commons Attribution 4.0 International License (CC-BY). 
+A small amount of data are included in the repository, extracted from a corrupted PDF file. These data are covered by a CC-BY-NC-ND license held by Irish Government.
+
