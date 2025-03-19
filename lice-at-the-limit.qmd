@@ -61,7 +61,7 @@ bib <- read.bib("lice.bib")
 ## Introduction
 
 Regulations impose a burden on the regulated. 
-Companies will seek to minimise the cost of compliance by developing efficient procedures [@Rubashkina2015], by circumventing the regulations [@Kakade2021], fraudulently claiming to comply [@Jung2019], or by breaching them if the penalties are low or enforcement is weak [@Sahramaeki2015].
+Companies will seek to minimise the cost of compliance by developing efficient procedures [@Rubashkina2015], circumventing the regulations [@Kakade2021], fraudulently claiming to comply [@Jung2019], or by breaching them if the penalties are low or enforcement is weak [@Sahramaeki2015].
 If circumvention is widespread, regulations may fail to reach their objectives even though all parties are apparently fully complying [@Kakade2021].
 More onerous regulations further increase the cost of compliance and risk higher levels of non-compliance [@Kakade2021].
 
@@ -106,12 +106,11 @@ They have both the lowest limit for female lice per fish and, since 2013, the li
 In contrast, Iceland, Ireland and British Columbia (Canada), the limit is a trigger for mandatory treatment, and in Scotland the limit is a trigger for increased monitoring and the trigger for treatment is six adult female lice per fish  [@Vormedal2023].
 
 
-In this paper, we explore how compliance with louse regulations by the aquaculture industry is affected by the severity of the regulations.
-This analysis builds upon the work of Jeong et al. [-@Jeong2023] who reported that in Norway the distribution of louse counts has an unexpected "cliff" or discontinuity at the regulatory limit.
-Data from British Columbia did not show this discontinuity.
+In this paper, I explore how compliance with louse regulations by the aquaculture industry is affected by the severity and nature of the regulations.
+This analysis builds upon the work of Jeong et al. [-@Jeong2023] who reported an unexpected "cliff" or discontinuity in the distribution of louse counts at the regulatory limit in Norway but not in British Columbia.
 Jeong et al. [-@Jeong2023] ascribe this discontinuity to a desire by aquaculture managers to report values below the regulatory limits, but do not identify the mechanisms by which they could do this. 
 Sævik and Sandvik [-@Saevik2023] dispute this interpretation, arguing that the discontinuity is due to efficient lice treatment in Norway.
-We extend this analysis to other countries with farmed and wild salmonoids, 
+I extend this analysis to other countries with farmed and wild salmonoids, 
 testing if there is a discontinuity in the louse counts distribution at the regulatory limit and try to explain it by natural processes or due to the regulations being circumvented. 
 
 ## Methods
@@ -124,11 +123,11 @@ tar_load(periods)
 ```
 
 
-We examine the distribution of the mean louse counts reported by the aquaculture facilities to the national regulators using publicly available data.
+I examine the distribution of the mean louse counts reported by the aquaculture facilities to the national regulators using publicly available data.
 Lice count data were downloaded from the regulators in British Columbia (`r periods$britishColumbia`) [@FOC2024], Ireland (`r periods$ireland`) [@MarineInstitute20082024], Norway (`r periods$norway`) [@Barentswatch2024], and Scotland (`r periods$scotland`) [@SEPA2024].
 Lice count data from Iceland (2016--2024) were available from one of the operators [@arnarlax2024].
 
-We test for discontinuities at the regulatory limits using the `r pkrt("rddensity")`.
+I test for discontinuities at the regulatory limits using the `r pkrt("rddensity")`.
 All analyses were done in `r pkrt("R")`. 
 Code to reproduce the analyses is available from https://github.com/richardjtelford/lice-at-the-limit
 
@@ -225,7 +224,7 @@ If the number of lice per fish was simulated with a negative binomial, to allow 
 
 Sævik and Sandvik [-@Saevik2023] simulate lice population growth and treatment to generate data that resemble the data shown by Jeong et al. [-@Jeong2023].
 In their simulation, once the lice abundance exceeds the regulatory limit, there is a 90% probability that the fish are cleaned with an efficacy of 0.9. 
-This is identical to the third mechanism we propose (see below).
+This is identical to the third mechanism proposed below.
 
 ```{r}
 #| label: fig-count-uncertainty
@@ -252,7 +251,7 @@ It is akin to optional stopping in hypothesis testing, where the sample size is 
 Optional stopping is a form of p-hacking recognised as a questionable research practice [@Stefan2023] and causes an excess of p-values just below the significance threshold, and a deficit just above.
 The severity of optional stopping for gaming limits depends on the number of times the current count is checked and the number of fish examined between checks [@Stefan2023]. 
 
-To show the effect of optimal stopping, we run a simulation of `r optimal_stopping$nsim` lice counts. 
+To show the effect of optimal stopping, I run a simulation of `r optimal_stopping$nsim` lice counts. 
 In each count, the lice have a Poisson distribution with a mean of `r optimal_stopping$true_mean` per fish. If the original count on `r optimal_stopping$noriginal` fish exceeded the regulatory limit of `r optimal_stopping$threshold` lice per fish, an extra `r optimal_stopping$nextra` fish are counted and the mean louse count recalculated.
 In a simulation, `r optimal_stopping$thresh_original`% of the original counts exceed the limit, whereas `r optimal_stopping$thresh_final`% of the counts after optimal stopping exceed the limit. 
 
@@ -326,8 +325,7 @@ In practice, if the trigger for treatment was strictly enforced, the situation w
 
 ## Acknowledgements
 
-Discussions with Mari Lie Larsen and Ingeborg Kahrs helped formulate the argument in this paper. 
-Cathy Jenks edited the language.
+Work on this paper was initiated following discussions with the Bio300b class of 2024. Mari Lie Larsen pointed me in the right direction, and Cathy Jenks edited the language.
 
 ## Data availability
 
