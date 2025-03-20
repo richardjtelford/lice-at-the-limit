@@ -34,8 +34,8 @@ execute:
 Histograms showing the distribution of the mean number of lice per fish in British Columbia (@suppfig-bc), Iceland (@suppfig-iceland), Ireland (@suppfig-ireland), and Norway (@suppfig-norway1, @suppfig-norway2) when the lice count is greater than zero.
 All histograms are truncated to better show the distribution of lice counts near the regulatory limit.
 The vertical dashed line shows the regulatory limit on the number of lice per fish. 
-In Norway from 2017, the limit in reduced in the smolt migration season.
-
+In Ireland and in Norway from 2017, the limit is reduced in the smolt migration season.
+There is enough data from Norway to show the distribution of lice counts for each year.
 
 ```{r}
 #| label: setup
@@ -66,14 +66,18 @@ plot_hist <- function(data, x, xlab = "Mean number of adult female lice per fish
   
   if (!is.null(vline)) {
     p <- p + 
-      geom_vline(data = vline, aes(xintercept = lice), linetype = "dashed", colour = "#99151c")
+      geom_vline(data = vline, aes(xintercept = limit), linetype = "dashed", colour = "#99151c")
   }
   
   if (facet == "year") {
     p <- p + facet_wrap(vars(year), ncol = 2)
   } else if (facet == "seasonyear") {
-    p <- p + facet_grid(rows = vars(year), cols = vars(limit), 
+    p <- p + facet_grid(rows = vars(year), cols = vars(as.character(limit)), 
                         labeller = labeller(limit = c("0.2" = "Smolt migration", "0.5" = "Ex smolt migration")))
+  } else if (facet == "season") {
+    p <- p + 
+      facet_wrap(vars(limit), 
+                 labeller = labeller(limit = c("0.5" = "Smolt migration", "2" = "Ex smolt migration")))
   }
   
   p
@@ -84,7 +88,9 @@ plot_hist <- function(data, x, xlab = "Mean number of adult female lice per fish
 :::{#suppfig-bc}
 ```{r}
 
-all_data$britishColumbia |> plot_hist(vline = tibble(lice = 3), xlim = c(0, 5), xlab = "Mean number of motile lice per fish")
+all_data$britishColumbia |> 
+  plot_hist(vline = tibble(limit = 3), xlim = c(0, 5), 
+            xlab = "Mean number of motile lice per fish")
 
 ```
 
@@ -94,7 +100,7 @@ British Columbia
 :::{#suppfig-iceland}
 ```{r}
 
-all_data$iceland |> plot_hist(vline = tibble(lice = 0.5))
+all_data$iceland |> plot_hist(vline = tibble(limit = 0.5))
 
 ```
 
@@ -104,10 +110,10 @@ Iceland
 :::{#suppfig-ireland}
 
 ```{r}
-
 all_data$ireland |> 
-  plot_hist(vline = tibble(lice = 0.5), xlab = "Mean number of egg-bearing lice per fish")
-
+  plot_hist(vline =  tibble(limit = c(0.5, 2)),
+            xlab = "Mean number of egg-bearing lice per fish",
+            facet = "season")
 ```
 Ireland
 :::
@@ -120,7 +126,7 @@ Ireland
 
 all_data$norway |> 
   filter(year < 2017) |> 
-  plot_hist(vline = tibble(lice = 0.5), facet = "year", xlim = c(0, 2))
+  plot_hist(vline = tibble(limit = 0.5), facet = "year", xlim = c(0, 2))
 ```
 Norway 2012 -- 2016
 :::
@@ -135,7 +141,7 @@ Norway 2012 -- 2016
 all_data$norway |> 
   filter(!limit == "Ukjent") |> 
   filter(year >= 2017) |> 
-  plot_hist(vline = tibble(lice = c(0.2, 0.5), limit = c("0.2", "0.5")), facet = "seasonyear", xlim = c(0, 1))
+  plot_hist(vline = tibble(limit = c(0.2, 0.5)), facet = "seasonyear", xlim = c(0, 1))
 ```
 Norway since 2017
 :::
