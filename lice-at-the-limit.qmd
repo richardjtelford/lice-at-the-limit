@@ -332,6 +332,9 @@ Work on this paper was initiated following discussions with the Bio300b class of
 All data are publicly available from the regulators in Canada, Ireland, Norway, and Scotland, or an aquaculture facility operator in Iceland.
 Code to reproduce this manuscript is available from  https://github.com/richardjtelford/lice-at-the-limit
 
+## Author contribution statement
+
+R.J.T: Conceptualization, Formal analysis, Investigation, Methodology, Validation, Visualization, Writing – original draft, Writing – review & editing.
 
 ## References
 
